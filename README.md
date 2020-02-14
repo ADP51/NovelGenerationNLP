@@ -1,6 +1,6 @@
-# H1 Novel Generation
+# Novel Generation
 
-### H3 Setting up environment
+### Setting up environment
 Using conda: conda env remove --name env
 
 
