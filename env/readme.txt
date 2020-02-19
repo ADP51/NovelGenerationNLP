@@ -2,7 +2,6 @@ Package Summary - List of non-dependent packages:
 
 jupyter
 keras
-numpy
 pandas
 spacy
 tensorflow
