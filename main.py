@@ -98,6 +98,11 @@ def on_epoch_end(epoch, _):
     print('----- Generating text after Epoch: %d' % epoch)
 
     start_index = random.randint(0, len(text) - maxlen - 1)
+    
+    """
+    Diversity represents probability scaling. The greater the number the more 'creative' the model
+    will try to be, which will lead to more unique outputs but also more errors
+    """
     for diversity in [0.2, 0.5, 1.0, 1.2]:
         print('----- Diversity:', diversity)
 
@@ -107,6 +112,7 @@ def on_epoch_end(epoch, _):
         print('----- Generating with seed: "' + sentence + '"')
         sys.stdout.write(generated)
 
+        # predict the next 400 characters
         for i in range(400):
             x_pred = np.zeros((1, maxlen, len(chars)))
             for t, char in enumerate(sentence):
