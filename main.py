@@ -13,7 +13,7 @@ from keras.layers import LSTM
 from keras.optimizers import RMSprop
 
 #file path for all of the state of the union addresses
-corpora_dir = "/Users/andrewpalmer/nltk_data/corpora/state_union"
+corpora_dir = "/home/andrew/nltk_data/corpora/state_union"
 
 # Read all file paths in corpora directory
 file_list = []
