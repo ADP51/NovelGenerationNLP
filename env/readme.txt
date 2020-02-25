@@ -5,5 +5,6 @@ keras
 pandas
 spacy
 tensorflow
+unidecode
 
 Please update this list when new packages are added.

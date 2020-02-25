@@ -41,6 +41,7 @@ https://repo.anaconda.com/pkgs/main/win-64/termcolor-1.1.0-py37_1.conda
 https://repo.anaconda.com/pkgs/main/noarch/toolz-0.10.0-py_0.tar.bz2
 https://repo.anaconda.com/pkgs/main/noarch/tqdm-4.42.1-py_0.conda
 https://repo.anaconda.com/pkgs/main/win-64/ujson-1.35-py37hfa6e2cd_0.conda
+https://repo.anaconda.com/pkgs/main/noarch/unidecode-1.1.1-py_0.tar.bz2
 https://repo.anaconda.com/pkgs/main/noarch/werkzeug-1.0.0-py_0.conda
 https://repo.anaconda.com/pkgs/main/win-64/win_inet_pton-1.1.0-py37_0.conda
 https://repo.anaconda.com/pkgs/main/win-64/wincertstore-0.2-py37_0.conda
