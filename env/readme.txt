@@ -1,5 +1,6 @@
 Package Summary - List of non-dependent packages:
 
+cchardet
 jupyter
 keras
 pandas
