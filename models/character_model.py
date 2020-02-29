@@ -45,14 +45,15 @@ class LanguageModel(object):
  
     #create the lstm cells     
     def make_lstm_cell(self, dropout_keep_prob):
-        cell = tf.nn.rnn_cell.LSTMCell(self.num_lstm_units) 
-        dropout_cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=dropout_keep_prob)
-        return dropout_cell
+        cell = tf.nn.rnn_cell.LSTMCell(self.num_lstm_units) #create the cell
+        dropout_cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=dropout_keep_prob) # determine the dropout probability for the cell
+        return dropout_cell 
 
+    # using dropout regularization to mitigate overtraining
     def stacked_lstm_cells(self, is_training):
-        dropout_keep_prob = 0.5 if is_training else 1.0
-        cell_list = [self.make_lstm_cell(dropout_keep_prob) for i in range(self.num_lstm_layers)]
-        cell = tf.nn.rnn_cell.MultiRNNCell(cell_list)
+        dropout_keep_prob = 0.5 if is_training else 1.0 # set dropout probability to 50% if training
+        cell_list = [self.make_lstm_cell(dropout_keep_prob) for i in range(self.num_lstm_layers)] # create a list of lstm cells to be used in the model
+        cell = tf.nn.rnn_cell.MultiRNNCell(cell_list) # 
         return cell
 
    def get_input_embeddings(self, input_sequences):
