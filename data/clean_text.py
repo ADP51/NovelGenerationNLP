@@ -120,6 +120,11 @@ def regex_edit(line):
     # Matches must be preceded by at least one character, and NOT followed by two.
     # The first character after the match must, also, not be a space.
 
+    # Add line breaks at 'break' tags
+    if COUNT:
+        log_count += len(re.findall(r"<br/>", line))
+    line = re.sub(r"<br/>", "\n", line)
+
     # Remove all remaining tags
     for exp in list_delete_tags:
         if COUNT:
