@@ -1,0 +1,95 @@
+Reading Alice Perrin__Romance__Star of India.htm
+File encoding: ASCII
+Stats:   14628 edits --   0.31 seconds 
+Created file: text-clean/Alice Perrin__Romance__Star of India.txt
+
+Reading Amanda McKittrick Ros__None__Irene Iddesleigh.html
+File encoding: UTF-8
+Stats:   21428 edits --   0.14 seconds 
+Created file: text-clean/Amanda McKittrick Ros__None__Irene Iddesleigh.txt
+
+Reading Annie French Hector__Romance__Kate Vernon Volume 1.htm
+File encoding: ISO-8859-1
+Stats:   30607 edits --   0.17 seconds 
+Created file: text-clean/Annie French Hector__Romance__Kate Vernon Volume 1.txt
+
+Reading Annie French Hector__Romance__Kate Vernon Volume 2.htm
+File encoding: ISO-8859-1
+Stats:   43645 edits --   0.30 seconds 
+Created file: text-clean/Annie French Hector__Romance__Kate Vernon Volume 2.txt
+
+Reading C. A. Dawson Scott__Romance__Wastralls.html
+File encoding: UTF-8
+Stats:   64132 edits --   0.43 seconds 
+Created file: text-clean/C. A. Dawson Scott__Romance__Wastralls.txt
+
+Reading Charles Garvice__Romance__Only a Girl's Love.htm
+File encoding: ISO-8859-15
+Stats:  107442 edits --   0.79 seconds 
+Created file: text-clean/Charles Garvice__Romance__Only a Girl's Love.txt
+
+Reading F. Anstey__Comedy__A Bayard From Bengal - Copy.htm
+File encoding: ASCII
+Stats:  114921 edits --   0.15 seconds 
+Created file: text-clean/F. Anstey__Comedy__A Bayard From Bengal - Copy.txt
+
+Reading F. Anstey__Comedy__Baboo Jabberjee, B.A..htm
+File encoding: ASCII
+Stats:  126093 edits --   0.18 seconds 
+Created file: text-clean/F. Anstey__Comedy__Baboo Jabberjee, B.A..txt
+
+Reading F. Anstey__Comedy__In Brief Authority.htm
+File encoding: ASCII
+Stats:  152185 edits --   0.48 seconds 
+Created file: text-clean/F. Anstey__Comedy__In Brief Authority.txt
+
+Reading F. Anstey__Comedy__The Brass Bottle.htm
+File encoding: ASCII
+Stats:  168262 edits --   0.26 seconds 
+Created file: text-clean/F. Anstey__Comedy__The Brass Bottle.txt
+
+Reading F. Anstey__Comedy__The Talking Horse, and Other Tales.htm
+File encoding: ASCII
+Stats:  185703 edits --   0.33 seconds 
+Created file: text-clean/F. Anstey__Comedy__The Talking Horse, and Other Tales.txt
+
+Reading F. Anstey__Comedy__The Tinted Venus, A Farcical Romance.htm
+File encoding: ASCII
+Stats:  200052 edits --   0.27 seconds 
+Created file: text-clean/F. Anstey__Comedy__The Tinted Venus, A Farcical Romance.txt
+
+Reading F. Anstey__Comedy__Vice Versa, or, A Lesson to Fathers.htm
+File encoding: ASCII
+Stats:  219989 edits --   0.37 seconds 
+Created file: text-clean/F. Anstey__Comedy__Vice Versa, or, A Lesson to Fathers.txt
+
+Reading J. R. R. Tolkien__Fantasy__The Fellowship of the Ring.html
+File encoding: WINDOWS-1252
+Stats:  251718 edits --   0.61 seconds 
+Created file: text-clean/J. R. R. Tolkien__Fantasy__The Fellowship of the Ring.txt
+
+Reading J. R. R. Tolkien__Fantasy__The Hobbit.html
+File encoding: ASCII
+Stats:  269206 edits --   0.29 seconds 
+Created file: text-clean/J. R. R. Tolkien__Fantasy__The Hobbit.txt
+
+Reading J. R. R. Tolkien__Fantasy__The Return of the King.html
+File encoding: WINDOWS-1252
+Stats:  295500 edits --   0.46 seconds 
+Created file: text-clean/J. R. R. Tolkien__Fantasy__The Return of the King.txt
+
+Reading J. R. R. Tolkien__Fantasy__The Silmarillion.html
+File encoding: WINDOWS-1252
+Stats:  313356 edits --   0.44 seconds 
+Created file: text-clean/J. R. R. Tolkien__Fantasy__The Silmarillion.txt
+
+Reading J. R. R. Tolkien__Fantasy__Two Towers.html
+File encoding: WINDOWS-1250
+Stats:  336533 edits --   0.48 seconds 
+Created file: text-clean/J. R. R. Tolkien__Fantasy__Two Towers.txt
+
+Reading James Joyce__None__Ulysses.htm
+File encoding: UTF-8
+Stats:  401577 edits --   1.26 seconds 
+Created file: text-clean/James Joyce__None__Ulysses.txt
+
