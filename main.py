@@ -31,7 +31,7 @@ for files in file_list:
         try:
             str_form = fin.read().lower().replace('\n', '')
             docs.append(str_form)
-        except UnicodeDecodeError: 
+        except UnicodeDecodeError:  
             # Some sentences have wierd characters. Ignore them for now
             pass
 # Combine them all into a string of text
@@ -39,18 +39,15 @@ text = ' '.join(docs)
 
 print('corpus length:', len(text))
 
-# create a vocabulary of chars
-chars = sorted(list(set(text)))
-print('Total Number of Unique Characters:', len(chars))
-char_indices = dict((c, i) for i, c in enumerate(chars)) # Character to index
-indices_char = dict((i, c) for i, c in enumerate(chars)) # Index to Character
+# The unique characters in the file
+vocab = sorted(set(text))
+print('Vocabulary size: {}'.format(len(vocab)))
 
-"""
-Recommended to run this script on GPU, as recurrent
-networks are quite computationally intensive.
-If you try this script on new data, make sure your corpus
-has at least ~100k characters. ~1M is better.
-"""
+# Creating a mapping from unique characters to indices
+char2idx = {u:i for i, u in enumerate(vocab)}
+idx2char = np.array(vocab)
+
+text_as_int = np.array([char2idx[c] for c in text])
 
 # cut the text in semi-redundant sequences of maxlen characters
 maxlen = 40 # Number of characters considered

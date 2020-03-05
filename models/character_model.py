@@ -1,87 +1,140 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import tensorflow as tf
 
-"""
-Using a fixed max sequence length can increase the training speed and also 
-help the language model avoid overfitting uncommon text dependencies 
-(which are sometimes found in long, run-on sentences).
-"""
-def truncate_sequences(sequence, max_length):
-    input_sequence = sequence[:max_length-1]
-    target_sequence = sequence[1:max_length]
-    return input_sequence, target_sequence
+import numpy as np
+import os
+import time
 
-# For each sequence that's shorter than the maximum sequence length, 
-# we append a special non-vocabulary token to the end of the sequence 
-# until its length is equal to the maximum sequence length.
-def pad_sequences(sequence, max_length):
-    padding_amount = max_length - len(sequence)
-    padding = [0 for i in range(padding_amount)]
-    input_sequence = sequence[:-1] + padding
-    target_sequence = sequence[1:] + padding
-    return input_sequence, target_sequence
+EPOCHS = 30
+BATCH_SIZE = 64
 
-# LSTM Language Model
-class LanguageModel(object):
-    # Model Initialization
-    def __init__(self, vocab_size, max_length, num_lstm_units, num_lstm_layers):
-        self.vocab_size = vocab_size
-        self.max_length = max_length
-        self.num_lstm_units = num_lstm_units
-        self.num_lstm_layers = num_lstm_layers
-        self.tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=vocab_size)
+# Buffer size to shuffle the dataset
+# (TF data is designed to work with possibly infinite sequences,
+# so it doesn't attempt to shuffle the entire sequence in memory. Instead,
+# it maintains a buffer in which it shuffles elements).
+BUFFER_SIZE = 10000
 
-    def get_input_target_sequence(self, sequence):
-        seq_len = len(sequence)
-        if seq_len >= self.max_length:
-            input_sequence, target_sequence = truncate_sequences(
-                sequence, self.max_length
-            )
-        else:
-            # Next chapter
-            input_sequence, target_sequence = pad_sequences(
-                sequence, self.max_length
-            )
-        return input_sequence, target_sequence
- 
-    #create the lstm cells     
-    def make_lstm_cell(self, dropout_keep_prob):
-        cell = tf.nn.rnn_cell.LSTMCell(self.num_lstm_units) #create the cell
-        dropout_cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=dropout_keep_prob) # determine the dropout probability for the cell
-        return dropout_cell 
+# import shakespeare text files
+path_to_file = tf.keras.utils.get_file('shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
 
-    # using dropout regularization to mitigate overtraining
-    def stacked_lstm_cells(self, is_training):
-        dropout_keep_prob = 0.5 if is_training else 1.0 # set dropout probability to 50% if training
-        cell_list = [self.make_lstm_cell(dropout_keep_prob) for i in range(self.num_lstm_layers)] # create a list of lstm cells to be used in the model
-        cell = tf.nn.rnn_cell.MultiRNNCell(cell_list) # 
-        return cell
+text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
+# length of text is the number of characters in it
+print('Length of raw text: {} characters'.format(len(text)))
 
-   def get_input_embeddings(self, input_sequences):
-        embedding_dim = int(self.vocab_size**0.25)
-        initial_bounds = 0.5 / embedding_dim
-        initializer = tf.random_uniform(
-            [self.vocab_size, embedding_dim],
-            minval=-initial_bounds,
-            maxval=initial_bounds)
-        self.input_embedding_matrix = tf.get_variable('input_embedding_matrix',
-            initializer=initializer)
-        input_embeddings = tf.nn.embedding_lookup(self.input_embedding_matrix, input_sequences)
-        return input_embeddings
+# The unique characters in the file
+vocab = sorted(set(text))
+print('Vocabulary size: {}'.format(len(vocab)))
+
+# Creating a mapping from unique characters to indices
+char2idx = {u:i for i, u in enumerate(vocab)}
+idx2char = np.array(vocab)
+
+text_as_int = np.array([char2idx[c] for c in text])
+
+seq_length = 100
+examples_per_epoch = len(text)//(seq_length + 1)
+
+# Create training examples / targets
+char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
+sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
+
+# for each sequence duplicate and shift it to create training input and target
+def split_input_target(chunk):
+    input_text = chunk[:-1]
+    target_text = chunk[1:]
+    return input_text, target_text
+
+# map the input / target sequences 
+dataset = sequences.map(split_input_target)
+
+# shuffle the dataset
+dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
+
+# Length of the vocabulary in chars
+vocab_size = len(vocab)
+
+# The embedding dimension
+embedding_dim = 256
+
+# Number of RNN units
+rnn_units = 1024
+
+def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
+  model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim,
+                              batch_input_shape=[batch_size, None]),
+    tf.keras.layers.GRU(rnn_units,
+                        return_sequences=True,
+                        stateful=True,
+                        recurrent_initializer='glorot_uniform'),
+    tf.keras.layers.Dense(vocab_size)
+  ])
+  return model
+
+# build the model
+model = build_model(
+  vocab_size = len(vocab),
+  embedding_dim=embedding_dim,
+  rnn_units=rnn_units,
+  batch_size=BATCH_SIZE)
+
+def loss(labels, logits):
+  return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
+
+model.compile(optimizer='adam', loss=loss)
+
+# Directory where the checkpoints will be saved
+checkpoint_dir = './training_checkpoints'
+# Name of the checkpoint files
+checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+
+checkpoint_callback=tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_prefix,
+    save_weights_only=True)
+
+def train_model(model, dataset, epochs, checkpoint_callback):
+    model.fit(dataset, epochs=epochs, callbacks = checkpoint_callback)  
+    return model
     
-    # Run the LSTM on the input sequences
-    def run_lstm(self, input_sequences, is_training):
-        cell = self.stacked_lstm_cells(is_training)
-        input_embeddings = self.get_input_embeddings(input_sequences)
-        binary_sequences = tf.sign(input_sequences)
-        sequence_lengths = tf.reduce_sum(binary_sequences, axis=1)
-        lstm_outputs, _ = tf.nn.dynamic_rnn(
-        cell,
-        input_embeddings,
-        sequence_length=sequence_lengths,
-        dtype=tf.float32)
-        return lstm_outputs, binary_sequences 
+model = train_model(model, dataset, EPOCHS, checkpoint_callback)
 
+def generate_text(model, start_string):
+  # Evaluation step (generating text using the learned model)
 
+  # Number of characters to generate
+  num_generate = 1000
+
+  # Converting our start string to numbers (vectorizing)
+  input_eval = [char2idx[s] for s in start_string]
+  input_eval = tf.expand_dims(input_eval, 0)
+
+  # Empty string to store our results
+  text_generated = []
+
+  # Low temperatures results in more predictable text.
+  # Higher temperatures results in more surprising text.
+  # Experiment to find the best setting.
+  temperature = 1.0
+
+  # Here batch size == 1
+  model.reset_states()
+  for i in range(num_generate):
+      predictions = model(input_eval)
+      # remove the batch dimension
+      predictions = tf.squeeze(predictions, 0)
+
+      # using a categorical distribution to predict the character returned by the model
+      predictions = predictions / temperature
+      predicted_id = tf.random.categorical(predictions, num_samples=1)[-1,0].numpy()
+
+      # We pass the predicted character as the next input to the model
+      # along with the previous hidden state
+      input_eval = tf.expand_dims([predicted_id], 0)
+
+      text_generated.append(idx2char[predicted_id])
+
+  return (start_string + ''.join(text_generated))
 
 
 
