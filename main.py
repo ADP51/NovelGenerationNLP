@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from character_model import build_model, train_model, generate_text
+from author_model import build_model, train_model, generate_text
 import tensorflow as tf
 
 import numpy as np
