@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from author_model import build_model, train_model, generate_text
+import author_model as am
 import tensorflow as tf
 
 import numpy as np
@@ -15,12 +15,8 @@ BATCH_SIZE = 64
 # it maintains a buffer in which it shuffles elements).
 BUFFER_SIZE = 10000
 
+text = am.import_homersimpson()
 
-# import shakespeare text files
-path_to_file = tf.keras.utils.get_file(
-    'shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
-
-text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
 # length of text is the number of characters in it
 print('Length of raw text: {} characters'.format(len(text)))
 
@@ -66,7 +62,7 @@ embedding_dim = 256
 rnn_units = 1024
 
 # build the model
-model = build_model(
+model = am.build_model(
     vocab_size=len(vocab),
     embedding_dim=embedding_dim,
     rnn_units=rnn_units,
@@ -80,7 +76,7 @@ def loss(labels, logits):
 model.compile(optimizer='adam', loss=loss)
 
 # Directory where the checkpoints will be saved
-checkpoint_dir = './training_checkpoints'
+checkpoint_dir = './training_checkpoints/homer'
 # Name of the checkpoint files
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
@@ -88,4 +84,4 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_prefix,
     save_weights_only=True)
 
-model = train_model(model, dataset, EPOCHS, checkpoint_callback)
+# model = am.train_model(model, dataset, EPOCHS, checkpoint_callback)

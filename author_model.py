@@ -5,7 +5,24 @@ import tensorflow as tf
 import numpy as np
 import os
 import time
+import csv
 
+def import_shakespeare():
+    # import shakespeare text files
+    path_to_file = tf.keras.utils.get_file(
+        'shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
+    text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
+    return text
+
+def import_homersimpson():
+    text = ""
+    with open("./data/simpsons_dataset.csv", newline='') as csvfile:
+        spamreader = csv.DictReader(csvfile, delimiter=',')
+        for row in spamreader:
+            if "Homer" in row['character']:
+                text += row['spoken_words']
+                text += " "
+    return text
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
     model = tf.keras.Sequential([
