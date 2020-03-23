@@ -6,6 +6,7 @@ from author_model import build_model
 # These tests are hard to test as they return models with variable information
 class MyTestCase(unittest.TestCase):
 
+    #TODO Change the file that is read to one that is already stored in our database
     # Tests the build a model method from author_model
     def test_build_model(self):
         # get the basic path for a test document
@@ -28,11 +29,11 @@ class MyTestCase(unittest.TestCase):
         # check to make sure the model is valid
         self.assertTrue(True)
 
-    # This test cant really be run without running the whole program
+    #TODO Need a small prebuilt model to run the train model method
     def test_train_model(self):
         self.assertEqual(True, True)
 
-    # Test using regex but needs a model
+    #TODO Use the prebuilt model to generate text and use regex to make sure it worked properly
     def test_generate_text(self):
         self.assertEqual(True, True)
 
