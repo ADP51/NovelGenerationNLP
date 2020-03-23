@@ -1,6 +1,6 @@
 import unittest
 import tensorflow as tf
-from author_model import build_model
+from author_model import build_model, generate_text, train_model
 
 
 # These tests are hard to test as they return models with variable information
@@ -9,7 +9,9 @@ class MyTestCase(unittest.TestCase):
     # Tests the build a model method from author_model
     def test_build_model(self):
         # get the basic path for a test document
-        text = open('../data/shakespeare-hamlet.txt', 'rb').read().decode(encoding='utf-8')
+        with open('../data/shakespeare-hamlet.txt', 'rb') as f:
+            text = f.read().decode(encoding='utf-8')
+
         vocab = sorted(set(text))
 
         # run the model
@@ -25,13 +27,25 @@ class MyTestCase(unittest.TestCase):
         # check to make sure the model is valid
         self.assertTrue(True)
 
-    #TODO Need a small prebuilt model to run the train model method
+    # TODO Need to replace the None values with the correct model
     def test_train_model(self):
-        self.assertEqual(True, True)
+        model = None
+        dataset = None
+        epochs = 1
+        checkpoint_callback = None
+        try:
+            train_model(model, dataset, epochs, checkpoint_callback)
+        except:
+            self.assertFalse(True)
 
-    #TODO Use the prebuilt model to generate text and use regex to make sure it worked properly
+        self.assertTrue(True)
+
+    # TODO Need to replace the None values with the correct model
     def test_generate_text(self):
-        self.assertEqual(True, True)
+        model = None
+        char2idx = None
+        idx2char = None
+        self.assertRegex(generate_text(model, 'This is a test string', char2idx, idx2char), "This is a test string .*")
 
 
 if __name__ == '__main__':
