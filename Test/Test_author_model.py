@@ -6,14 +6,10 @@ from author_model import build_model
 # These tests are hard to test as they return models with variable information
 class MyTestCase(unittest.TestCase):
 
-    #TODO Change the file that is read to one that is already stored in our database
     # Tests the build a model method from author_model
     def test_build_model(self):
         # get the basic path for a test document
-        path_to_file = tf.keras.utils.get_file(
-            'shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
-
-        text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
+        text = open('../data/shakespeare-hamlet.txt', 'rb').read().decode(encoding='utf-8')
         vocab = sorted(set(text))
 
         # run the model
