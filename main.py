@@ -67,7 +67,7 @@ rnn_units = 1024
 
 # build the model
 model = build_model(
-    vocab_size=len(vocab),
+    vocab_size=vocab_size,
     embedding_dim=embedding_dim,
     rnn_units=rnn_units,
     batch_size=BATCH_SIZE)
@@ -76,11 +76,10 @@ model = build_model(
 def loss(labels, logits):
     return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
-
 model.compile(optimizer='adam', loss=loss)
 
 # Directory where the checkpoints will be saved
-checkpoint_dir = './training_checkpoints'
+checkpoint_dir = '.'
 # Name of the checkpoint files
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
@@ -88,4 +87,13 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_prefix,
     save_weights_only=True)
 
-model = train_model(model, dataset, EPOCHS, checkpoint_callback)
+new_model = build_model(
+    vocab_size=len(vocab),
+    embedding_dim=embedding_dim,
+    rnn_units=rnn_units,
+    batch_size=1)
+
+new_model.load_weights(tf.train.latest_checkpoint("./training/shakespeare"))
+new_model.build(tf.TensorShape([1, None]))
+new_model.summary()
+print(generate_text(new_model, "Thou shall not pass", char2idx, idx2char))
