@@ -98,9 +98,6 @@ def main():
     new_model.summary()
     print(generate_text(new_model, "Thou shall not pass", char2idx, idx2char))
 
-    # TODO finish this code, cause model has to print something and this is not it
-    generate_text(model, "This is where the story begins", char2idx, idx2char)
-
 
 if __name__ == '__main__':
     main()

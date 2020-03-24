@@ -2,6 +2,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import tensorflow as tf
 
+import numpy as np
+import os
+import time
+import csv
+
+def save_char_mapping(vocab, csv_name):
+    with open(csv_name, 'w') as file:
+        writer = csv.writer(file)
+        for i, u in enumerate(vocab):
+            writer.writerow({i:u})
+            
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
     model = tf.keras.Sequential([
@@ -17,7 +28,7 @@ def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
 
 
 def train_model(model, dataset, epochs, checkpoint_callback):
-    model.fit(dataset, epochs=epochs, callbacks=checkpoint_callback)
+    model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])
     return model
 
 
