@@ -57,4 +57,4 @@ def generate_text(model, start_string, char2idx, idx2char):
 
         text_generated.append(idx2char[predicted_id])
 
-    return (start_string + ''.join(text_generated))
+    return start_string + ''.join(text_generated)
