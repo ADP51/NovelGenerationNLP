@@ -14,7 +14,6 @@ def save_char_mapping(vocab, csv_name):
             writer.writerow({i:u})
             
 
-
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
     model = tf.keras.Sequential([
         tf.keras.layers.Embedding(vocab_size, embedding_dim,
@@ -69,6 +68,4 @@ def generate_text(model, start_string, char2idx, idx2char):
 
         text_generated.append(idx2char[predicted_id])
 
-    return (start_string + ''.join(text_generated))
-
-    
+    return start_string + ''.join(text_generated)

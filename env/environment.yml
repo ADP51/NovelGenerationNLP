@@ -1,0 +1,9 @@
+dependencies:
+  - numpy
+  - os
+  - tensorflow
+  - jupyter
+  - keras
+  - pandas
+  - unidecode
+  - cchardet

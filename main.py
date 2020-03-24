@@ -4,44 +4,13 @@ import tensorflow as tf
 
 import numpy as np
 import os
-import time
 
-EPOCHS = 30
+EPOCHS = 30     # EPOCHS is the amount of times the model is trained
 BATCH_SIZE = 64
-
-# Buffer size to shuffle the dataset
-# (TF data is designed to work with possibly infinite sequences,
-# so it doesn't attempt to shuffle the entire sequence in memory. Instead,
-# it maintains a buffer in which it shuffles elements).
-BUFFER_SIZE = 10000
-
-
-# import shakespeare text files
-path_to_file = tf.keras.utils.get_file(
-    'shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
-
-text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
-# length of text is the number of characters in it
-print('Length of raw text: {} characters'.format(len(text)))
-
-# The unique characters in the file
-vocab = sorted(set(text))
-print('Vocabulary size: {}'.format(len(vocab)))
-
-# Creating a mapping from unique characters to indices
-char2idx = {u: i for i, u in enumerate(vocab)}
-idx2char = np.array(vocab)
-
-text_as_int = np.array([char2idx[c] for c in text])
-
+BUFFER_SIZE = 10000     # Buffer size to shuffle the dataset
 seq_length = 100
-examples_per_epoch = len(text)//(seq_length + 1)
-
-# Create training examples / targets
-char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
-sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
-
-# for each sequence duplicate and shift it to create training input and target
+embedding_dim = 256     # The embedding dimension
+rnn_units = 1024        # Number of RNN units
 
 
 def split_input_target(chunk):
@@ -50,50 +19,85 @@ def split_input_target(chunk):
     return input_text, target_text
 
 
-# map the input / target sequences
-dataset = sequences.map(split_input_target)
-
-# shuffle the dataset
-dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
-
-# Length of the vocabulary in chars
-vocab_size = len(vocab)
-
-# The embedding dimension
-embedding_dim = 256
-
-# Number of RNN units
-rnn_units = 1024
-
-# build the model
-model = build_model(
-    vocab_size=vocab_size,
-    embedding_dim=embedding_dim,
-    rnn_units=rnn_units,
-    batch_size=BATCH_SIZE)
-
-
 def loss(labels, logits):
     return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
-model.compile(optimizer='adam', loss=loss)
 
-# Directory where the checkpoints will be saved
-checkpoint_dir = '.'
-# Name of the checkpoint files
-checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+def open_file():
+    # import shakespeare text files
+    path_to_file = tf.keras.utils.get_file(
+        'shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
 
-checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_prefix,
-    save_weights_only=True)
+    return open(path_to_file, 'rb').read().decode(encoding='utf-8')
 
-new_model = build_model(
-    vocab_size=len(vocab),
-    embedding_dim=embedding_dim,
-    rnn_units=rnn_units,
-    batch_size=1)
 
-new_model.load_weights(tf.train.latest_checkpoint("./training/shakespeare"))
-new_model.build(tf.TensorShape([1, None]))
-new_model.summary()
-print(generate_text(new_model, "Thou shall not pass", char2idx, idx2char))
+def read_file(text):
+    # length of text is the number of characters in it
+    print('Length of raw text: {} characters'.format(len(text)))
+
+    # The unique characters in the file
+    vocab = sorted(set(text))
+    print('Vocabulary size: {}'.format(len(vocab)))
+
+    return vocab
+
+
+def start_model(char2idx, text):
+
+    text_as_int = np.array([char2idx[c] for c in text])
+
+    # Create training examples / targets
+    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
+    sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
+
+    # map the input / target sequences
+    dataset = sequences.map(split_input_target)
+
+    # shuffle the dataset
+    return dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
+
+
+def main():
+    text = open_file()
+    vocab = read_file(text)
+
+    char2idx = {u: i for i, u in enumerate(vocab)}
+    idx2char = np.array(vocab)
+
+    dataset = start_model(char2idx, text)
+
+    # Length of the vocabulary in chars
+    vocab_size = len(vocab)
+
+    # build the model
+    model = build_model(
+        vocab_size=vocab_size,
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=BATCH_SIZE)
+
+    model.compile(optimizer='adam', loss=loss)
+
+    # Directory where the checkpoints will be saved
+    checkpoint_dir = '.'
+    # Name of the checkpoint files
+    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_prefix,
+        save_weights_only=True)
+
+    new_model = build_model(
+        vocab_size=len(vocab),
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=1)
+
+    new_model.load_weights(tf.train.latest_checkpoint("./training/shakespeare"))
+    new_model.build(tf.TensorShape([1, None]))
+    new_model.summary()
+    print(generate_text(new_model, "Thou shall not pass", char2idx, idx2char))
+
+
+if __name__ == '__main__':
+    main()
