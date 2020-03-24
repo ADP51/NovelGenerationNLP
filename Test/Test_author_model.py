@@ -29,10 +29,14 @@ class MyTestCase(unittest.TestCase):
 
     # TODO Need to replace the None values with the correct model
     def test_train_model(self):
+
+        # variables for the model
         model = None
         dataset = None
         epochs = 1
         checkpoint_callback = None
+
+        # run the train_model method
         try:
             train_model(model, dataset, epochs, checkpoint_callback)
         except:
@@ -42,9 +46,12 @@ class MyTestCase(unittest.TestCase):
 
     # TODO Need to replace the None values with the correct model
     def test_generate_text(self):
+        # variables for the models
         model = None
         char2idx = None
         idx2char = None
+
+        # run a Regex check to make sure it prints out correctly
         self.assertRegex(generate_text(model, 'This is a test string', char2idx, idx2char), "This is a test string .*")
 
 
