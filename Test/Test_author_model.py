@@ -1,10 +1,19 @@
 import unittest
-import tensorflow as tf
-from author_model import build_model, generate_text, train_model
+from author_model import build_model, generate_text, train_model, save_char_mapping
+from main import open_file, read_file, load_model, compile_model
+import csv
 
 
-# These tests are hard to test as they return models with variable information
 class MyTestCase(unittest.TestCase):
+
+    # TODO the assert statement is incorrect
+    def test_save_char_mapping(self):
+
+        text = open_file()
+        vocab = read_file(text)
+
+        save_char_mapping(vocab, 'test.csv')
+        self.assertEqual(csv.reader('test.csv'), csv.reader('shakespeare.csv'))
 
     # Tests the build a model method from author_model
     def test_build_model(self):
@@ -46,10 +55,16 @@ class MyTestCase(unittest.TestCase):
 
     # TODO Need to replace the None values with the correct model
     def test_generate_text(self):
+        idx2char = []
+
         # variables for the models
-        model = None
-        char2idx = None
-        idx2char = None
+        with open('shakespeare_map.csv') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                idx2char.append(row[1])
+            char2idx = {k: v for v, k in enumerate(idx2char)}
+            model = compile_model(len(char2idx))
+            model = load_model('shakespeare_checkpoint')
 
         # run a Regex check to make sure it prints out correctly
         self.assertRegex(generate_text(model, 'This is a test string', char2idx, idx2char), "This is a test string .*")
