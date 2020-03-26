@@ -7,6 +7,7 @@ import os
 import time
 import csv
 
+
 def save_char_mapping(vocab, csv_name):
     with open(csv_name, 'w') as file:
         writer = csv.writer(file)
