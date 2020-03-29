@@ -20,7 +20,8 @@ def import_homersimpson():
         spamreader = csv.DictReader(csvfile, delimiter=',')
         for row in spamreader:
             if "Homer" in row['character']:
-                text += row['spoken_words']
+                new_line = row['character'].strip('\"')
+                text += new_line
                 text += " "
     return text
 
