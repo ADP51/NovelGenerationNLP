@@ -39,7 +39,7 @@ def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
 
 
 def train_model(model, dataset, epochs, checkpoint_callback):
-    model.fit(dataset, epochs=epochs, callbacks=checkpoint_callback)
+    model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])
     return model
 
 
