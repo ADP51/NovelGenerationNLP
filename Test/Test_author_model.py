@@ -55,19 +55,20 @@ class MyTestCase(unittest.TestCase):
 
     # TODO Need to replace the None values with the correct model
     def test_generate_text(self):
-        idx2char = []
+        id_to_char = []
+        char_to_id = {}
+        seed = 'Start Text '
 
-        # variables for the models
-        with open('shakespeare_map.csv') as file:
+        with open('./shakespeare_map.csv') as file:
             reader = csv.reader(file)
             for row in reader:
-                idx2char.append(row[1])
-            char2idx = {k: v for v, k in enumerate(idx2char)}
-            model = compile_model(len(char2idx))
-            model = load_model('shakespeare_checkpoint')
+                id_to_char.append(row[1])
+            char_to_id = {k: v for v, k in enumerate(id_to_char)}
 
-        # run a Regex check to make sure it prints out correctly
-        self.assertRegex(generate_text(model, 'This is a test string', char2idx, idx2char), "This is a test string .*")
+        model = build_model(vocab_size=len(char_to_id), embedding_dim=256, rnn_units=1024, batch_size=64)
+        model = load_model('./shakespeare_checkpoint')
+
+        self.assertRegex(generate_text(model, seed, char_to_id, id_to_char, num_to_generate=50), "Start Text .*")
 
 
 if __name__ == '__main__':
