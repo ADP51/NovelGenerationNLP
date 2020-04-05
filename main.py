@@ -1,158 +1,146 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+import author_model as am
+import tensorflow as tf
+import csv
 
-import nltk
 import numpy as np
 import os
-import random
-import sys
 
-from keras.callbacks import LambdaCallback
-from keras.callbacks import ModelCheckpoint
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
+EPOCHS = 50     # EPOCHS is the amount of times the model is trained
+BATCH_SIZE = 128 # number of samples that will be propagated through the network
+BUFFER_SIZE = 10000 # Buffer size to shuffle the dataset
+seq_length = 100
+embedding_dim = 300     # The embedding dimension
+rnn_units = 1024        # Number of RNN units
 
-#file path for all of the state of the union addresses
-corpora_dir = "/home/andrew/nltk_data/corpora/state_union"
+def read_homerSimpson():
+    text = ""
+    with open("./data/simpsons_dataset.csv", newline='') as csvfile:
+        spamreader = csv.DictReader(csvfile, delimiter=',')
+        for row in spamreader:
+            if "Homer" in row['character']:
+                new_line = row['spoken_words'].strip('\"')
+                text += new_line
+                text += " "
 
-# Read all file paths in corpora directory
-file_list = []
-for root, _ , files in os.walk(corpora_dir):  
-    for filename in files:
-        file_list.append(os.path.join(root, filename))
-        
-print("Read ", len(file_list), " files..." )
+    if(len(text) < 1000000):
+        print(f"Corpus size : {len(text)}, consider using larger dataset.")
+    else:
+        print(f"Corpus size : {len(text)}")
 
-# Extract text from all documents
-docs = []
+    return text
 
-for files in file_list:
-    with open(files, 'r') as fin:
-        try:
-            str_form = fin.read().lower().replace('\n', '')
-            docs.append(str_form)
-        except UnicodeDecodeError: 
-            # Some sentences have wierd characters. Ignore them for now
-            pass
-# Combine them all into a string of text
-text = ' '.join(docs)
+def read_shakespeare():
+    # Read all file paths in corpora directory
+    file_list = []
+    for root, _ , files in os.walk("./training/shakespeare"):  
+        for filename in files:
+            file_list.append(os.path.join(root, filename))
 
-print('corpus length:', len(text))
+    print("Read ", len(file_list), " files..." )
 
-# create a vocabulary of chars
-chars = sorted(list(set(text)))
-print('Total Number of Unique Characters:', len(chars))
-char_indices = dict((c, i) for i, c in enumerate(chars)) # Character to index
-indices_char = dict((i, c) for i, c in enumerate(chars)) # Index to Character
+    # Extract text from all documents
+    docs = []
 
-"""
-Recommended to run this script on GPU, as recurrent
-networks are quite computationally intensive.
-If you try this script on new data, make sure your corpus
-has at least ~100k characters. ~1M is better.
-"""
+    for files in file_list:
+        with open(files, 'r') as fin:
+            try:
+                str_form = fin.read().lower().replace('\n', '')
+                docs.append(str_form)
+            except UnicodeDecodeError: 
+                # Some sentences have wierd characters. Ignore them for now
+                pass
 
-# cut the text in semi-redundant sequences of maxlen characters
-maxlen = 40 # Number of characters considered
-step = 3 # Stide of our window
-sentences = []
-next_chars = []
+    # Combine them all into a string of text
+    text = ' '.join(docs)
 
-# Rading the text in terms of sequence of characters
-# Extract only 'maxlen' characters every time
-for i in range(0, len(text) - maxlen, step):
-    sentences.append(text[i: i + maxlen])
-    # The character just after the sequence is the label
-    next_chars.append(text[i + maxlen]) 
-print('nb sequences:', len(sentences))
-
-print('Vectorization...')
-# Initializing Tensor (training data)
-x = np.zeros((len(sentences), maxlen, len(chars)), dtype=np.bool) 
-# Initializing Output that holds next character (label)
-y = np.zeros((len(sentences), len(chars)), dtype=np.bool) 
-for i, sentence in enumerate(sentences):
-    for t, char in enumerate(sentence):
-        # Populate Tensor Input
-        x[i, t, char_indices[char]] = 1 
-    # Populate y with the character just after the sequence
-    y[i, char_indices[next_chars[i]]] = 1
-
-
-def sample(preds, temperature=1.0):
-    """Perform Temperature Sampling"""
-    # helper function to sample an index from a probability array
-    preds = np.asarray(preds).astype('float64')
-    preds = np.log(preds) / temperature 
-    exp_preds = np.exp(preds)
-    # Softmax of predictions
-    preds = exp_preds / np.sum(exp_preds) 
-    # Sample a single characters, with probabilities defined in `preds`
-    probas = np.random.multinomial(1, preds, 1) 
-    return np.argmax(probas)
-
-
-def on_epoch_end(epoch, _):
-    """Function invoked at end of each epoch. Prints generated text"""
-    print()
-    print('----- Generating text after Epoch: %d' % epoch)
-
-    start_index = random.randint(0, len(text) - maxlen - 1)
+    if(len(text) < 1000000):
+        print(f"Corpus size : {len(text)}, consider using larger dataset.")
+    else:
+        print(f"Corpus size : {len(text)}")
     
-    """
-    Diversity represents probability scaling. The greater the number the more 'creative' the model
-    will try to be, which will lead to more unique outputs but also more errors
-    """
-    for diversity in [0.2, 0.5, 1.0, 1.2]:
-        print('----- Diversity:', diversity)
+    return text
 
-        generated = ''
-        sentence = text[start_index: start_index + maxlen]
-        generated += sentence
-        print('----- Generating with seed: "' + sentence + '"')
-        sys.stdout.write(generated)
 
-        # predict the next 400 characters
-        for i in range(400):
-            x_pred = np.zeros((1, maxlen, len(chars)))
-            for t, char in enumerate(sentence):
-                x_pred[0, t, char_indices[char]] = 1.
+def create_training_segments(segment):
+    input_data = segment[:-1]
+    training_data = segment[1:]
+    return input_data, training_data
 
-            preds = model.predict(x_pred, verbose=0)[0]
-            # Generate next character
-            next_index = sample(preds, diversity) 
-            next_char = indices_char[next_index]
-            
-            # Append character to generated sequence
-            generated += next_char 
-            sentence = sentence[1:] + next_char
 
-            sys.stdout.write(next_char)
-            sys.stdout.flush()
-        print()
-    
-    # Save model weights into file
-    model.save_weights('saved_weights.hdf5', overwrite=True)
-        
+# set up loss for model
+def loss(labels, logits):
+    return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
-# After every single epoch, we are going to call the function on_epoch_end
-# to generate some text.
-print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
-checkpointer = ModelCheckpoint(filepath='/tmp/weights.hdf5', verbose=1, save_best_only=True)
 
-print('Building model...')
-# Initialize Sequential Model
-model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars))))
-# Add the output layer that is a softmax of the number of characters
-model.add(Dense(len(chars), activation='softmax')) 
-# Optimization through RMSprop
-optimizer_new = RMSprop() 
-# Consider cross Entropy loss. Why? MLE of P(D | theta)
-model.compile(loss='categorical_crossentropy', optimizer=optimizer_new) 
+def read_corpus(text):
+    # The unique characters in the file
+    vocab = sorted(set(text))
+    print(f"Vocabulary size : {len(vocab)}")
 
-# Train this for 30 epochs. Size of output from LSTM i.e. hidden layer vector shape=128
-model.fit(x, y,
-          batch_size=128,
-          epochs=30,
-          callbacks=[print_callback, checkpointer])
+    return vocab
+
+
+
+def start_model(char_idx, text):
+
+    text_as_int = np.array([char_idx[c] for c in text])
+
+    # Create training examples / targets
+    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
+    segments = char_dataset.batch(seq_length+1, drop_remainder=True)
+
+    # map the input / training segments
+    dataset = segments.map(create_training_segments)
+
+    # shuffle the dataset
+    return dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
+
+
+def main():
+    text = read_homerSimpson()
+    vocab = read_corpus(text)
+
+    char_idx = {u: i for i, u in enumerate(vocab)}
+    idx2char = np.array(vocab)
+
+    dataset = start_model(char_idx, text)
+
+    # Length of the vocabulary in chars
+    vocab_size = len(vocab)
+
+    # build the model
+    model = am.build_model(
+        vocab_size=vocab_size,
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=BATCH_SIZE)
+
+    model.compile(optimizer='adam', loss=loss)
+    model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+
+    # Directory where the checkpoints will be saved
+    # Name of the checkpoint files
+    checkpoint_prefix = os.path.join("./training/simpson", "ckpt_{epoch}")
+
+    #callback function called at the end of epoch training
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_prefix,
+        save_weights_only=True)
+
+    am.train_model(model, dataset, EPOCHS, checkpoint_callback)
+
+    new_model = am.build_model(
+        vocab_size=len(vocab),
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=1)
+
+    new_model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+    new_model.build(tf.TensorShape([1, None]))
+    new_model.summary()
+    print(am.generate_text(new_model, "Donuts", char_idx, idx2char))
+
+
+if __name__ == '__main__':
+    main()
