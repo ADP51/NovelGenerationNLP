@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from author_model import build_model, train_model, generate_text
+from author_model import build_model, generate_text
 import tensorflow as tf
 
 import numpy as np
@@ -57,19 +57,7 @@ def start_model(char2idx, text):
     return dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
 
 
-def main():
-    text = open_file()
-    vocab = read_file(text)
-
-    char2idx = {u: i for i, u in enumerate(vocab)}
-    idx2char = np.array(vocab)
-
-    dataset = start_model(char2idx, text)
-
-    # Length of the vocabulary in chars
-    vocab_size = len(vocab)
-
-    # build the model
+def compile_model(vocab_size):
     model = build_model(
         vocab_size=vocab_size,
         embedding_dim=embedding_dim,
@@ -78,6 +66,10 @@ def main():
 
     model.compile(optimizer='adam', loss=loss)
 
+    return model
+
+
+def save_model():
     # Directory where the checkpoints will be saved
     checkpoint_dir = '.'
     # Name of the checkpoint files
@@ -87,15 +79,40 @@ def main():
         filepath=checkpoint_prefix,
         save_weights_only=True)
 
-    new_model = build_model(
-        vocab_size=len(vocab),
-        embedding_dim=embedding_dim,
-        rnn_units=rnn_units,
-        batch_size=1)
 
-    new_model.load_weights(tf.train.latest_checkpoint("./training/shakespeare"))
-    new_model.build(tf.TensorShape([1, None]))
-    new_model.summary()
+def load_model(model):
+    model.load_weights(tf.train.latest_checkpoint("./training/shakespeare"))
+    model.build(tf.TensorShape([1, None]))
+    model.summary()
+
+    return model
+
+
+def char_to_idx(vocab):
+    return {u: i for i, u in enumerate(vocab)}
+
+
+def idx_to_char(vocab):
+    return np.array(vocab)
+
+
+def main():
+    text = open_file()
+    vocab = read_file(text)
+
+    char2idx = char_to_idx(vocab)
+    idx2char = idx_to_char(vocab)
+
+    dataset = start_model(char2idx, text)
+
+    # build the model
+    model = compile_model(len(vocab))
+
+    save_model()
+
+    new_model = compile_model(len(vocab))
+    new_model = load_model(new_model)
+
     print(generate_text(new_model, "Thou shall not pass", char2idx, idx2char))
 
 
