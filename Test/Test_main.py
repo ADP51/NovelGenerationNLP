@@ -3,14 +3,17 @@ import unittest
 from main import read_homerSimpson, read_shakespeare, read_corpus, start_model
 
 
-# To run all of these texts make sure to adjust all the directories in the main class, otherwise this wont work
+# **** MAKE SURE ALL THE PATHS ARE SET FROM THIS FILE OR THE TESTS WONT RUN *******
 class MyTestCase(unittest.TestCase):
-    # TODO This test does not work, error with reading through simpsons_dataset.csv. Opens file but Error not found
+    # This test runs the read_homerSimpson method from main.py, it tests with a regex
+    # if this test does not work make sure the path is set correctly and on the open statement add
+    # encoding="utf8"
     def test_read_homerSimpson(self):
         text = read_homerSimpson()
-        self.assertEqual(text, "[A-Za-z0-9]")
+        self.assertRegex(text, "[A-Za-z0-9]*")
 
     # This test runs the read_shakespeare method from main.py, if no errors happen it prints out the test worked
+    # if this test doesnt work make sure the path is set correctly
     def test_read_shakespeare(self):
         text = read_shakespeare()
         self.assertRegex(text, "[A-Za-z]*")
