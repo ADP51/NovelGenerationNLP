@@ -16,6 +16,7 @@ class MyTestCase(unittest.TestCase):
     # if this test doesnt work make sure the path is set correctly
     def test_read_shakespeare(self):
         text = read_shakespeare()
+        self.assertNotEqual(text, "")
         self.assertRegex(text, "[A-Za-z]*")
 
     # Does not require testing so returns true
@@ -30,7 +31,7 @@ class MyTestCase(unittest.TestCase):
     def test_read_corpus(self):
         text = read_shakespeare()
         vocab = read_corpus(text)
-        self.assertEquals(True, True)
+        self.assertNotEquals(vocab, "")
 
     # Tests the create model method, if there are no errors it prints out successful
     def test_start_model(self):
@@ -39,7 +40,7 @@ class MyTestCase(unittest.TestCase):
         char_idx = {u: i for i, u in enumerate(vocab)}
 
         test = start_model(char_idx, text)
-        self.assertEquals(True, True)
+        self.assertNotEquals(test, None)
 
 
 if __name__ == '__main__':
