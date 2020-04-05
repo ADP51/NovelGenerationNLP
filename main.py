@@ -1,87 +1,146 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import author_model as am
 import tensorflow as tf
+import csv
 
 import numpy as np
 import os
-import time
 
-EPOCHS = 30
-BATCH_SIZE = 64
-
-# Buffer size to shuffle the dataset
-# (TF data is designed to work with possibly infinite sequences,
-# so it doesn't attempt to shuffle the entire sequence in memory. Instead,
-# it maintains a buffer in which it shuffles elements).
-BUFFER_SIZE = 10000
-
-text = am.import_homersimpson()
-
-# length of text is the number of characters in it
-print('Length of raw text: {} characters'.format(len(text)))
-
-# The unique characters in the file
-vocab = sorted(set(text))
-print('Vocabulary size: {}'.format(len(vocab)))
-
-# Creating a mapping from unique characters to indices
-char2idx = {u: i for i, u in enumerate(vocab)}
-idx2char = np.array(vocab)
-
-text_as_int = np.array([char2idx[c] for c in text])
-
+EPOCHS = 50     # EPOCHS is the amount of times the model is trained
+BATCH_SIZE = 128 # number of samples that will be propagated through the network
+BUFFER_SIZE = 10000 # Buffer size to shuffle the dataset
 seq_length = 100
-examples_per_epoch = len(text)//(seq_length + 1)
+embedding_dim = 300     # The embedding dimension
+rnn_units = 1024        # Number of RNN units
 
-# Create training examples / targets
-char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
-sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
+def read_homerSimpson():
+    text = ""
+    with open("./data/simpsons_dataset.csv", newline='') as csvfile:
+        spamreader = csv.DictReader(csvfile, delimiter=',')
+        for row in spamreader:
+            if "Homer" in row['character']:
+                new_line = row['spoken_words'].strip('\"')
+                text += new_line
+                text += " "
 
-# for each sequence duplicate and shift it to create training input and target
+    if(len(text) < 1000000):
+        print(f"Corpus size : {len(text)}, consider using larger dataset.")
+    else:
+        print(f"Corpus size : {len(text)}")
+
+    return text
+
+def read_shakespeare():
+    # Read all file paths in corpora directory
+    file_list = []
+    for root, _ , files in os.walk("./training/shakespeare"):  
+        for filename in files:
+            file_list.append(os.path.join(root, filename))
+
+    print("Read ", len(file_list), " files..." )
+
+    # Extract text from all documents
+    docs = []
+
+    for files in file_list:
+        with open(files, 'r') as fin:
+            try:
+                str_form = fin.read().lower().replace('\n', '')
+                docs.append(str_form)
+            except UnicodeDecodeError: 
+                # Some sentences have wierd characters. Ignore them for now
+                pass
+
+    # Combine them all into a string of text
+    text = ' '.join(docs)
+
+    if(len(text) < 1000000):
+        print(f"Corpus size : {len(text)}, consider using larger dataset.")
+    else:
+        print(f"Corpus size : {len(text)}")
+    
+    return text
 
 
-def split_input_target(chunk):
-    input_text = chunk[:-1]
-    target_text = chunk[1:]
-    return input_text, target_text
+def create_training_segments(segment):
+    input_data = segment[:-1]
+    training_data = segment[1:]
+    return input_data, training_data
 
 
-# map the input / target sequences
-dataset = sequences.map(split_input_target)
-
-# shuffle the dataset
-dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
-
-# Length of the vocabulary in chars
-vocab_size = len(vocab)
-
-# The embedding dimension
-embedding_dim = 256
-
-# Number of RNN units
-rnn_units = 1024
-
-# build the model
-model = am.build_model(
-    vocab_size=len(vocab),
-    embedding_dim=embedding_dim,
-    rnn_units=rnn_units,
-    batch_size=BATCH_SIZE)
-
-
+# set up loss for model
 def loss(labels, logits):
     return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
 
-model.compile(optimizer='adam', loss=loss)
+def read_corpus(text):
+    # The unique characters in the file
+    vocab = sorted(set(text))
+    print(f"Vocabulary size : {len(vocab)}")
 
-# Directory where the checkpoints will be saved
-checkpoint_dir = './training_checkpoints/homer'
-# Name of the checkpoint files
-checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+    return vocab
 
-checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_prefix,
-    save_weights_only=True)
 
-model = am.train_model(model, dataset, EPOCHS, checkpoint_callback)
+
+def start_model(char_idx, text):
+
+    text_as_int = np.array([char_idx[c] for c in text])
+
+    # Create training examples / targets
+    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
+    segments = char_dataset.batch(seq_length+1, drop_remainder=True)
+
+    # map the input / training segments
+    dataset = segments.map(create_training_segments)
+
+    # shuffle the dataset
+    return dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
+
+
+def main():
+    text = read_homerSimpson()
+    vocab = read_corpus(text)
+
+    char_idx = {u: i for i, u in enumerate(vocab)}
+    idx2char = np.array(vocab)
+
+    dataset = start_model(char_idx, text)
+
+    # Length of the vocabulary in chars
+    vocab_size = len(vocab)
+
+    # build the model
+    model = am.build_model(
+        vocab_size=vocab_size,
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=BATCH_SIZE)
+
+    model.compile(optimizer='adam', loss=loss)
+    model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+
+    # Directory where the checkpoints will be saved
+    # Name of the checkpoint files
+    checkpoint_prefix = os.path.join("./training/simpson", "ckpt_{epoch}")
+
+    #callback function called at the end of epoch training
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_prefix,
+        save_weights_only=True)
+
+    am.train_model(model, dataset, EPOCHS, checkpoint_callback)
+
+    new_model = am.build_model(
+        vocab_size=len(vocab),
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units,
+        batch_size=1)
+
+    new_model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+    new_model.build(tf.TensorShape([1, None]))
+    new_model.summary()
+    print(am.generate_text(new_model, "Donuts", char_idx, idx2char))
+
+
+if __name__ == '__main__':
+    main()
