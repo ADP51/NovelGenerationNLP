@@ -39,22 +39,19 @@ class MyTestCase(unittest.TestCase):
     # This test takes a while to run
     def test_train_model(self):
 
-        new_model, vocab = generate_model()
+        new_model, char_idx, idx2char = generate_model()
         self.assertTrue(new_model.built)
 
-    # TODO Error with the input_eval in the generate_text method
+    # TODO Shape error
     # This tests the generate_text method from the author_model.py, runs a regex check and then prints out the text
     # This test takes a while to run
     def test_generate_text(self):
         # run the train_model method
-        model, vocab = generate_model()
+        model, char_idx, idx2char = generate_model()
 
-        char_idx = {u: i for i, u in enumerate(vocab)}
-        idx2char = np.array(vocab)
-
-        output = generate_text(model, "This is a test string", char_idx, idx2char)
+        output = generate_text(model, "this is a test string", char_idx, idx2char)
         # run a Regex check to make sure it prints out correctly
-        self.assertRegex(output, "This is a test string .*")
+        self.assertRegex(output, "this is a test string .*")
         print(output)
 
 
@@ -73,6 +70,7 @@ def generate_model():
     model.load_weights(tf.train.latest_checkpoint("./testing/shakespeare"))
 
     char_idx = {u: i for i, u in enumerate(vocab)}
+    idx2char = np.array(vocab)
     dataset = start_model(char_idx, text)
 
     epochs = 1
@@ -84,7 +82,7 @@ def generate_model():
         filepath=checkpoint_prefix,
         save_weights_only=True)
 
-    return train_model(model, dataset, epochs, checkpoint_callback), vocab
+    return train_model(model, dataset, epochs, checkpoint_callback), char_idx, idx2char
 
 
 if __name__ == '__main__':
