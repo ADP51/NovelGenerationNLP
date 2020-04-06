@@ -6,20 +6,20 @@ import csv
 import numpy as np
 import os
 
-EPOCHS = 50     # EPOCHS is the amount of times the model is trained
+EPOCHS = 100     # EPOCHS is the amount of times the model is trained
 BATCH_SIZE = 128 # number of samples that will be propagated through the network
 BUFFER_SIZE = 10000 # Buffer size to shuffle the dataset
 seq_length = 100
 embedding_dim = 300     # The embedding dimension
 rnn_units = 1024        # Number of RNN units
 
-def read_homerSimpson():
+def read_csv(path_to_file, key, key_header, value_header):
     text = ""
-    with open("./data/simpsons_dataset.csv", newline='') as csvfile:
+    with open(path_to_file, newline='') as csvfile:
         spamreader = csv.DictReader(csvfile, delimiter=',')
         for row in spamreader:
-            if "Homer" in row['character']:
-                new_line = row['spoken_words'].strip('\"')
+            if key in row[key_header]:
+                new_line = row[value_header].strip('\"')
                 text += new_line
                 text += " "
 
@@ -30,10 +30,10 @@ def read_homerSimpson():
 
     return text
 
-def read_shakespeare():
+def read_text(path):
     # Read all file paths in corpora directory
     file_list = []
-    for root, _ , files in os.walk("./training/shakespeare"):  
+    for root, _ , files in os.walk(path): 
         for filename in files:
             file_list.append(os.path.join(root, filename))
 
@@ -98,15 +98,15 @@ def start_model(char_idx, text):
 
 
 def main():
-    text = read_homerSimpson()
+    text = read_text("./data/text-clean/poe")
     vocab = read_corpus(text)
 
     char_idx = {u: i for i, u in enumerate(vocab)}
-    idx2char = np.array(vocab)
+    idx_char = np.array(vocab)
 
     dataset = start_model(char_idx, text)
 
-    # Length of the vocabulary in chars
+    # Length of the vocabulary
     vocab_size = len(vocab)
 
     # build the model
@@ -117,18 +117,19 @@ def main():
         batch_size=BATCH_SIZE)
 
     model.compile(optimizer='adam', loss=loss)
-    model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+    # model.load_weights(tf.train.latest_checkpoint("./training/poe"))
 
     # Directory where the checkpoints will be saved
     # Name of the checkpoint files
-    checkpoint_prefix = os.path.join("./training/simpson", "ckpt_{epoch}")
+    checkpoint_prefix = os.path.join("./training/poe", "ckpt_{epoch}")
 
     #callback function called at the end of epoch training
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_prefix,
         save_weights_only=True)
 
-    am.train_model(model, dataset, EPOCHS, checkpoint_callback)
+    am.save_char_mapping(vocab, 'poe_map.csv')
+    # am.train_model(model, dataset, EPOCHS, checkpoint_callback)
 
     new_model = am.build_model(
         vocab_size=len(vocab),
@@ -136,10 +137,10 @@ def main():
         rnn_units=rnn_units,
         batch_size=1)
 
-    new_model.load_weights(tf.train.latest_checkpoint("./training/simpson"))
+    new_model.load_weights(tf.train.latest_checkpoint("./training/poe"))
     new_model.build(tf.TensorShape([1, None]))
     new_model.summary()
-    print(am.generate_text(new_model, "Donuts", char_idx, idx2char))
+    print(am.generate_text(new_model, "never more", char_idx, idx_char))
 
 
 if __name__ == '__main__':
