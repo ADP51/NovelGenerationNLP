@@ -13,6 +13,10 @@ from main import read_shakespeare, read_corpus, start_model, loss
 
 class MyTestCase(unittest.TestCase):
 
+    # No test can be written for this method
+    def test_save_char_mapping(self):
+        self.assertEqual(True, True)
+
     # Tests the build a model method from author_model
     def test_build_model(self):
         # get the basic path for a test document
@@ -31,76 +35,56 @@ class MyTestCase(unittest.TestCase):
         # check to make sure the model is valid
         self.assertTrue(model.built)
 
-    # TODO Need to replace the None values with the correct model
+    # Tests the train model method from author_model.py
+    # This test takes a while to run
     def test_train_model(self):
 
-        text = read_shakespeare()
-        vocab = read_corpus(text)
-
-        # build model
-        model = build_model(
-            vocab_size=len(vocab),
-            embedding_dim=256,
-            rnn_units=1024,
-            batch_size=64)
-
-        model.compile(optimizer='adam', loss=loss)
-        model.load_weights(tf.train.latest_checkpoint("./testing/shakespeare"))
-
-        char_idx = {u: i for i, u in enumerate(vocab)}
-        dataset = start_model(char_idx, text)
-
-        epochs = 1
-
-        checkpoint_prefix = os.path.join("./testing/shakespeare", "ckpt_{epoch}")
-
-        # callback function called at the end of epoch training
-        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-            filepath=checkpoint_prefix,
-            save_weights_only=True)
-
-        # run the train_model method
-        new_model = train_model(model, dataset, epochs, checkpoint_callback)
+        new_model, vocab = generate_model()
         self.assertTrue(new_model.built)
 
-    # TODO Need to replace the None values with the correct model
+    # TODO Error with the input_eval in the generate_text method
+    # This tests the generate_text method from the author_model.py, runs a regex check and then prints out the text
+    # This test takes a while to run
     def test_generate_text(self):
-        id_to_char = []
-        with open("./char_mappings/shakespeare_map.csv") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                id_to_char.append(row[1])
-            char_to_id = {k: v for v, k in enumerate(id_to_char)}
+        # run the train_model method
+        model, vocab = generate_model()
 
-        model = load_model(len(char_to_id), '../training/shakespeare')
+        char_idx = {u: i for i, u in enumerate(vocab)}
+        idx2char = np.array(vocab)
 
-        output = generate_text(model, 'This is a test string', char_to_id, id_to_char)
-
+        output = generate_text(model, "This is a test string", char_idx, idx2char)
         # run a Regex check to make sure it prints out correctly
         self.assertRegex(output, "This is a test string .*")
+        print(output)
 
 
-# Taken from the flask API repository
-def load_model(vocab_size, author_ckpt_path):
+def generate_model():
+    text = read_shakespeare()
+    vocab = read_corpus(text)
 
-    model = build(vocab_size, 256)
-    model.load_weights(tf.train.latest_checkpoint(author_ckpt_path))
-    model.build(tf.TensorShape([1, None]))
-    return model
+    # build model
+    model = build_model(
+        vocab_size=len(vocab),
+        embedding_dim=256,
+        rnn_units=1024,
+        batch_size=128)
 
+    model.compile(optimizer='adam', loss=loss)
+    model.load_weights(tf.train.latest_checkpoint("./testing/shakespeare"))
 
-# Taken from the flask API repository
-def build(vocab_size, shape):
-    model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, shape,
-                                  batch_input_shape=[1, None]),
-        tf.keras.layers.GRU(1024,
-                            return_sequences=True,
-                            stateful=True,
-                            recurrent_initializer='glorot_uniform'),
-        tf.keras.layers.Dense(vocab_size)
-    ])
-    return model
+    char_idx = {u: i for i, u in enumerate(vocab)}
+    dataset = start_model(char_idx, text)
+
+    epochs = 1
+
+    checkpoint_prefix = os.path.join("./testing/shakespeare", "ckpt_{epoch}")
+
+    # callback function called at the end of epoch training
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_prefix,
+        save_weights_only=True)
+
+    return train_model(model, dataset, epochs, checkpoint_callback), vocab
 
 
 if __name__ == '__main__':
