@@ -12,7 +12,9 @@ def save_char_mapping(vocab, csv_name):
     with open(csv_name, 'w') as file:
         writer = csv.writer(file)
         for i, u in enumerate(vocab):
-            writer.writerow({i:u})
+            print(i)
+            print(u)
+            writer.writerow([i,u])
             
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
@@ -33,14 +35,14 @@ def train_model(model, dataset, epochs, checkpoint_callback):
     return model
 
 
-def generate_text(model, start_string, char2idx, idx2char):
+def generate_text(model, start_string, char_idx, idx_char):
     # Evaluation step (generating text using the learned model)
 
     # Number of characters to generate
     num_generate = 1000
 
     # Converting our start string to numbers (vectorizing)
-    input_eval = [char2idx[s] for s in start_string]
+    input_eval = [char_idx[s] for s in start_string]
     input_eval = tf.expand_dims(input_eval, 0)
 
     # Empty string to store our results
@@ -67,6 +69,6 @@ def generate_text(model, start_string, char2idx, idx2char):
         # along with the previous hidden state
         input_eval = tf.expand_dims([predicted_id], 0)
 
-        text_generated.append(idx2char[predicted_id])
+        text_generated.append(idx_char[predicted_id])
 
     return start_string + ''.join(text_generated)
