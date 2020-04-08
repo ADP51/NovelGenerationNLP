@@ -16,3 +16,7 @@ When Zady ingests the text it scans through the entire corpus and finds each uni
  ### Creating training data
 
 So once we have our text preprocessed and ready to be fed into the network, we first need to create our training data. Zady is trained using supervised learning meaning we need to make a prediction about the next character in a sequence and try to guide it in the right direction based on what the actual next character in the sequence was, basically a complicated game of hot and cold. So we take our converted text and break it into *N* character segments and create an input segment that has one less character. We then feed the input segment into the network and make a prediction then adjust based on what the original segment has as the correct character.
+
+### Training 
+
+Once the training data is finished and ready to be used, we build a model consisting of three layer types, an embedding layer, GRU layer, and finally a Dense layer. The model is then trained against all of the training data, after each time the training data is completely run through the model will save itself in a binary file which we can then load the trained model from.
