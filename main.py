@@ -119,13 +119,9 @@ def main():
     model.compile(optimizer='adam', loss=loss)
     # model.load_weights(tf.train.latest_checkpoint("./training/poe"))
 
-    return model
-
-
-def save_model():
     # Directory where the checkpoints will be saved
     # Name of the checkpoint files
-    checkpoint_prefix = os.path.join("./training/poe", "ckpt_{epoch}")
+    checkpoint_prefix = os.path.join("training/poe", "ckpt_{epoch}")
 
     #callback function called at the end of epoch training
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -145,7 +141,7 @@ def save_model():
     new_model.build(tf.TensorShape([1, None]))
     new_model.summary()
     print(am.generate_text(new_model, "never more", char_idx, idx_char))
-
+    
 
 if __name__ == '__main__':
     main()
