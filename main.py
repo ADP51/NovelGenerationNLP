@@ -2,9 +2,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import author_model as am
 import tensorflow as tf
 import csv
+import re
+import pandas as pd 
+from time import time
+from collections import defaultdict
+import logging
+
+import spacy
 
 import numpy as np
 import os
+import sys 
+
+logging.basicConfig(stream=sys.stdout, format="%(levelname)s - %(asctime)s: %(message)s", datefmt= '%H:%M:%S', level=logging.INFO)
 
 EPOCHS = 100     # EPOCHS is the amount of times the model is trained
 BATCH_SIZE = 128 # number of samples that will be propagated through the network
