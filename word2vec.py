@@ -13,14 +13,15 @@ logging.basicConfig(stream=sys.stdout, format="%(levelname)s - %(asctime)s: %(me
 
 t = time()
 
+print("reading data...")
 df = pd.read_csv('./data/simpsons_dataset.csv')
 
 df.isnull().sum()
 
 df = df.dropna().reset_index(drop=True)
-print(df.isnull().sum())
+df.isnull().sum()
 
-
+print("Cleaning up... this will take a couple minutes.")
 nlp = spacy.load('en', disable=['ner', 'parser'])
 
 
@@ -42,8 +43,8 @@ print('Time to clean: {} min'.format(round((time()- t)/60,2)))
 
 df_clean = pd.DataFrame({'clean': txt})
 df_clean = df_clean.dropna().drop_duplicates()
-print(df_clean.shape)
 
+print("Begin training...")
 #https://radimrehurek.com/gensim/models/phrases.html
 # Automatically detect common phrases – aka multi-word expressions, word n-gram collocations – from a stream of sentences.
 sent = [row.split() for row in df_clean['clean']]
@@ -54,7 +55,7 @@ bigram = Phraser(phrases)
 
 sentences = bigram[sent]
 
-w2v_model = Word2Vec(min_count=20, window=2, size=300, sample=6e-5, alpha=0.03, min_alpha=0.0007, negative=20, workers=2)
+w2v_model = Word2Vec(min_count=20, window=2, size=300, sample=6e-5, alpha=0.03, min_alpha=0.0007, negative=20, workers=3)
 
 w2v_model.build_vocab(sentences, progress_per=10000)
 
@@ -66,4 +67,11 @@ print('Time to train the model: {} mins'.format(round((time() - t) / 60, 2)))
 w2v_model.wv.save_word2vec_format('./saved_models/model.bin', binary=True)
 w2v_model.init_sims(replace=True)
 
+vocab_len =len(w2v_model.wv.vocab)
+print(f"Vocabulary length: {vocab_len}")
+print("Checking 'homer'")
 print(w2v_model.wv.most_similar(positive=["homer"]))
+print("Checking 'donut")
+print(w2v_model.wv.most_similar(positive=["donut"]))
+print("Checking 'duff'")
+print(w2v_model.wv.most_similar(positive=["duff"]))
