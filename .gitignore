@@ -1,3 +1,7 @@
 training/simpsonBackup/checkpoint
 training/simpsonBackup/ckpt_50.data-00000-of-00001
 training/simpsonBackup/ckpt_50.index
+saved_models/model_model.model.wv.vectors.npy
+w2v_gen.py
+/w2v_gen.py
+/word2vec_simdemo.py
