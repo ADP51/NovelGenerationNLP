@@ -1,11 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="" />
+    <list default="true" id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/corpus.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/A Christmas Carol, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/A Clergyman's Daughter, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/A Study in Scarlet, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/A Tale of Two Cities, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Bleak House, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Burmese Days, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Coming Up for Air, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Compilation of the Stories of Chekhov, by Anton Chekhov.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/David Copperfield, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Down and Out in Paris and London, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Fifty Orwell Essays, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Great Expectations, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Hard Times, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/His Last Bow, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Homage to Catalonia, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Jane Eyre, by Charlotte Bronte.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Keep the Aspidistra Flying, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Nineteen eighty-four, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Oliver Twist, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Our Mutual Friend, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Poirot Investigates, by Agatha Christie.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Round the Fire Stories, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Shirley, by Charlotte Bronte.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Sir Nigel, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Tales of Terror and Mystery, by Sir Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Adventures of Sherlock Holmes, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Captain of the Polestar and Others, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Great Boer War, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Hound of the Baskervilles, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Last of the Legions and Other Tales of Long Ago, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Life and Adventures of Nicholas Nickleby, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Lost World by, Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Man in the Brown, Suit by Agatha Christie.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Memoirs of Sherlock Holmes, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Murder on the Links, by Agatha Christie.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Mysterious Affair at Styles, by Agatha Christie.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Old Curiosity Shop, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Pickwick Papers, by Charles Dickens.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Professor, by Charlotte Bronte.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Return of Sherlock Holmes, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Road to Wigan Pier, by George Orwell.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Secret Adversary, by Agatha Christie.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Sign of the Four, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The Valley of Fear, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/The White Company, by Arthur Conan Doyle.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Villette, by Charlotte Bronte.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus/Wuthering Heights, by Emily Bronte.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/corpus_directory.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/NLPproject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NLPproject.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Xo6RyAD9t6nJDPC39IhFpDquOh" />
   <component name="ProjectViewState">
@@ -23,11 +86,14 @@
       <recent name="$PROJECT_DIR$/data" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.corpus">
     <configuration name="NLPproject" type="PythonConfigurationType" factoryName="Python">
       <module name="NLPproject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -65,6 +131,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="corpus" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="NLPproject" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/corpus.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.corpus" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -85,9 +175,17 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="341" y="175" key="SettingsEditor" timestamp="1581700687861">
-      <screen x="0" y="23" width="1680" height="1027" />
+    <state x="3844" y="1238" key="#xdebugger.XInspectDialog" timestamp="1603598423057">
+      <screen x="3840" y="1072" width="1536" height="824" />
     </state>
-    <state x="341" y="175" key="SettingsEditor/0.23.1680.1027@0.23.1680.1027" timestamp="1581700687861" />
+    <state x="3844" y="1238" key="#xdebugger.XInspectDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1603598423057" />
+    <state x="4117" y="1125" width="981" height="715" key="SettingsEditor" timestamp="1603585948414">
+      <screen x="3840" y="1072" width="1536" height="824" />
+    </state>
+    <state x="4117" y="1125" width="981" height="715" key="SettingsEditor/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1603585948414" />
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog" timestamp="1603585917776">
+      <screen x="3840" y="1072" width="1536" height="824" />
+    </state>
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1603585917776" />
   </component>
 </project>
