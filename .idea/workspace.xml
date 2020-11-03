@@ -135,6 +135,9 @@
       <module name="NLPproject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -183,9 +186,9 @@
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
     <state x="4117" y="1125" width="981" height="715" key="SettingsEditor/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1603585948414" />
-    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog" timestamp="1603585917776">
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog" timestamp="1604432564879">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
-    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1603585917776" />
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604432564879" />
   </component>
 </project>
