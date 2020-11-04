@@ -47,6 +47,7 @@ def idx2word(idx, word_model):
 
 t = time()
 
+print("reading data...")
 df = pd.read_csv('./data/simpsons_dataset.csv')
 
 max_sentence_len = df['spoken_words'].str.len().max().astype(np.int32)
