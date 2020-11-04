@@ -6,21 +6,11 @@ import numpy as np
 import os
 import time
 import csv
-
-
-def save_char_mapping(vocab, csv_name):
-    with open(csv_name, 'w') as file:
-        writer = csv.writer(file)
-        for i, u in enumerate(vocab):
-            print(i)
-            print(u)
-            writer.writerow([i,u])
             
-
-def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
+def build_model(vocab_size, embedding_dim, rnn_units, batch_size, pretrained_weights):
     model = tf.keras.Sequential([
         tf.keras.layers.Embedding(vocab_size, embedding_dim,
-                                  batch_input_shape=[batch_size, None]),
+                                  batch_input_shape=[batch_size, None], weights=[pretrained_weights]),
         tf.keras.layers.GRU(rnn_units,
                             return_sequences=True,
                             stateful=True,

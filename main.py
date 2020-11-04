@@ -1,9 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import author_model as am
+import word2vec as w2v
 import tensorflow as tf
+from gensim.models import Word2Vec, KeyedVectors
 import csv
 import re
-import pandas as pd 
+import pandas as pd
 from time import time
 from collections import defaultdict
 import logging
@@ -12,16 +14,22 @@ import spacy
 
 import numpy as np
 import os
-import sys 
+import sys
 
-logging.basicConfig(stream=sys.stdout, format="%(levelname)s - %(asctime)s: %(message)s", datefmt= '%H:%M:%S', level=logging.INFO)
+logging.basicConfig(stream=sys.stdout, format="%(levelname)s - %(asctime)s: %(message)s",
+                    datefmt='%H:%M:%S', level=logging.INFO)
 
 EPOCHS = 100     # EPOCHS is the amount of times the model is trained
-BATCH_SIZE = 128 # number of samples that will be propagated through the network
-BUFFER_SIZE = 10000 # Buffer size to shuffle the dataset
+BATCH_SIZE = 128  # number of samples that will be propagated through the network
+BUFFER_SIZE = 10000  # Buffer size to shuffle the dataset
 seq_length = 100
 embedding_dim = 300     # The embedding dimension
 rnn_units = 1024        # Number of RNN units
+
+
+def load_word2vec(path_to_file):
+    return w2v.train_word2vec
+
 
 def read_csv(path_to_file, key, key_header, value_header):
     text = ""
@@ -40,14 +48,15 @@ def read_csv(path_to_file, key, key_header, value_header):
 
     return text
 
+
 def read_text(path):
     # Read all file paths in corpora directory
     file_list = []
-    for root, _ , files in os.walk(path): 
+    for root, _, files in os.walk(path):
         for filename in files:
             file_list.append(os.path.join(root, filename))
 
-    print("Read ", len(file_list), " files..." )
+    print("Read ", len(file_list), " files...")
 
     # Extract text from all documents
     docs = []
@@ -57,7 +66,7 @@ def read_text(path):
             try:
                 str_form = fin.read().lower().replace('\n', '')
                 docs.append(str_form)
-            except UnicodeDecodeError: 
+            except UnicodeDecodeError:
                 # Some sentences have wierd characters. Ignore them for now
                 pass
 
@@ -68,7 +77,7 @@ def read_text(path):
         print(f"Corpus size : {len(text)}, consider using larger dataset.")
     else:
         print(f"Corpus size : {len(text)}")
-    
+
     return text
 
 
@@ -89,6 +98,14 @@ def read_corpus(text):
     print(f"Vocabulary size : {len(vocab)}")
 
     return vocab
+
+
+def word2idx(word, model):
+    return model.wv.vocab[word].index
+
+
+def idx2word(idx, model):
+    return model.wv.index2word[idx]
 
 
 
@@ -116,6 +133,7 @@ def main():
 
     dataset = start_model(char_idx, text)
 
+    model = load_word2vec("./saved_models/model.bin")
     # Length of the vocabulary
     vocab_size = len(vocab)
 
@@ -131,14 +149,13 @@ def main():
 
     # Directory where the checkpoints will be saved
     # Name of the checkpoint files
-    checkpoint_prefix = os.path.join("training/poe", "ckpt_{epoch}")
+    checkpoint_prefix = os.path.join("training/simpson", "ckpt_{epoch}")
 
-    #callback function called at the end of epoch training
+    # callback function called at the end of epoch training
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_prefix,
         save_weights_only=True)
 
-    am.save_char_mapping(vocab, 'poe_map.csv')
     # am.train_model(model, dataset, EPOCHS, checkpoint_callback)
 
     new_model = am.build_model(
@@ -151,7 +168,7 @@ def main():
     new_model.build(tf.TensorShape([1, None]))
     new_model.summary()
     print(am.generate_text(new_model, "never more", char_idx, idx_char))
-    
+
 
 if __name__ == '__main__':
     main()
