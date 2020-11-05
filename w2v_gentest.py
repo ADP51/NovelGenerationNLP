@@ -39,7 +39,7 @@ def idx2word(idx):
 
 
 print('\nPreparing the data for LSTM...')
-train_x = np.zeros([len(grams), 40], dtype=np.int32)
+train_x = np.zeros([len(grams), 80], dtype=np.int32)
 train_y = np.zeros([len(grams)], dtype=np.int32)
 for i, sentence in enumerate(grams):
     for t, word in enumerate(sentence[:-1]):
@@ -68,7 +68,7 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 
-def generate_next(text, num_generated=10):
+def generate_next(text, num_generated=16):
     word_idxs = [word2idx(word) for word in text.lower().split()]
     for i in range(num_generated):
         prediction = model.predict(x=np.array(word_idxs))
@@ -80,10 +80,13 @@ def generate_next(text, num_generated=10):
 def on_epoch_end(epoch, _):
     print('\nGenerating text after epoch: %d' % epoch)
     texts = [
-        'homer duff',
-        'mayor kill',
-        'bart prank',
+        'homer',
+        'duff',
+        'donut',
+        'mayor',
+        'bart',
         'hello',
+        'kill'
     ]
     for text in texts:
         sample = generate_next(text)
@@ -92,5 +95,5 @@ def on_epoch_end(epoch, _):
 
 model.fit(train_x, train_y,
           batch_size=128,
-          epochs=20,
+          epochs=80,
           callbacks=[LambdaCallback(on_epoch_end=on_epoch_end)])

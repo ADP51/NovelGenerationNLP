@@ -5,3 +5,10 @@ saved_models/model_model.model.wv.vectors.npy
 w2v_gen.py
 /w2v_gen.py
 /word2vec_simdemo.py
+/saved_models/model.bin
+/saved_models/model.txt
+/saved_models/model_grams.txt
+/saved_models/model_model.bin
+/saved_models/model_model.model
+/saved_models/model_model.model.trainables.syn1neg.npy
+/saved_models/model_model.model.wv.vectors.npy
