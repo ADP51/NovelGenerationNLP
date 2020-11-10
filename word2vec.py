@@ -1,4 +1,5 @@
 import re
+import random
 import pandas as pd
 import numpy as np
 from time import time
@@ -31,7 +32,6 @@ logging.basicConfig(stream=sys.stdout, format="%(levelname)s - %(asctime)s: %(me
 def cleaning(doc):
     # Begin lemmatization
     txt = [token.lemma_ for token in doc]
-
     # Remove any sentence less than 2 words
     if len(txt) > 2:
         return ' '.join(txt)
@@ -73,17 +73,20 @@ print('Time to clean: {} min'.format(round((time() - t)/60, 2)))
 df_clean = pd.DataFrame({'clean': txt})
 df_clean = df_clean.dropna().drop_duplicates()
 
+for i in range(10):
+  print(df_clean.sample())
+  print(df.sample())
+
 # https://radimrehurek.com/gensim/models/phrases.html
 # Automatically detect common phrases – aka multi-word expressions, word n-gram collocations – from a stream of sentences.
-print(df_clean['clean'])
 sent = [row.split() for row in df['spoken_words']]
-print(sent)
 
 phrases = Phrases(sent, min_count=30, progress_per=10000)
 
 bigram = Phraser(phrases)
 
 sentences = bigram[sent]
+print(type(sentences))
 
 w2v_model = Word2Vec(min_count=20, window=4, size=300, sample=6e-5,
                     alpha=0.03, min_alpha=0.0007, negative=20, workers=2)
@@ -101,52 +104,16 @@ w2v_model.init_sims(replace=True)
 pretrained_weights = w2v_model.wv.syn0
 vocab_size, embedding_size = pretrained_weights.shape
 
-print("Preparing Training data...")
-train_x = np.zeros([len(sentences), max_sentence_len], dtype=np.int32)
-train_y = np.zeros([len(sentences)], dtype=np.int32)
-for i, sentence in enumerate(sentences):
-    for t, word in enumerate(sentence[:-1]):
-        train_x[i,t] = word2idx(word, w2v_model)
-    print(f"Debug: {sentence[-1]}")
-    train_y[i] = word2idx(sentence[-1], w2v_model)
+# lastWord = 'beer'
+# genTxt = []
 
-print('\nBuilding Model...')
-model = Sequential()
-model.add(Embedding(input_dim=vocab_size, output_dim=embedding_size, weights=[pretrained_weights]))
-model.add(GRU(rnn_units,return_sequences=True,stateful=True,recurrent_initializer='glorot_uniform'))
-model.add(Dense(units=vocab_size))
-model.add(Activation('softmax'))
-model.compile(optimizer='Adam', loss='sparse_categorical_crossentropy')
+# for i in range(500):
+#   extract = random.choice(w2v_model.wv.most_similar(positive=[lastWord]))
+#   lastWord = extract[0]
+#   print(lastWord)
+#   genTxt.append(lastWord)
 
-def sample(preds, temperature=1.0):
-  if temperature <= 0:
-    return np.argmax(preds)
-  preds = np.asarray(preds).astype('float64')
-  preds = np.log(preds) / temperature
-  exp_preds = np.exp(preds)
-  preds = exp_preds / np.sum(exp_preds)
-  probas = np.random.multinomial(1, preds, 1)
-  return np.argmax(probas)
+sentence2Change = df['spoken_words'].sample()
+new_sentence = [w2v_model.wv.most_similar(positive=[word])[0][0] for word in sentence2Change]
+print(' '.join(new_sentence))
 
-def generate_next(text, num_generated=10):
-  word_idxs = [word2idx(word, w2v_model) for word in text.lower().split()]
-  for i in range(num_generated):
-    prediction = model.predict(x=np.array(word_idxs))
-    idx = sample(prediction[-1], temperature=0.7)
-    word_idxs.append(idx)
-  return ' '.join(idx2word(idx, w2v_model) for idx in word_idxs)
-
-def on_epoch_end(epoch, _):
-  print('\nGenerating text after epoch: %d' % epoch)
-  texts = [
-    'stupid flanders ',
-    'I am so smart '
-  ]
-  for text in texts:
-    sample = generate_next(text)
-    print('%s... -> %s' % (text, sample))
-
-model.fit(train_x, train_y,
-          batch_size=128,
-          epochs=20,
-          callbacks=[LambdaCallback(on_epoch_end=on_epoch_end)])
