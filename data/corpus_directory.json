@@ -338,5 +338,14 @@
   {"filename": "The Voyage Out, by Virginia Woolf.txt", "title": "The Voyage Out",
     "author": "Virginia Woolf", "tags": ["biographical fiction", "romance", "british"]},
   {"filename": "Two stories, by Virginia Woolf.txt", "title": "Two stories",
-    "author": "Virginia Woolf", "tags": ["british"]}
+    "author": "Virginia Woolf", "tags": ["british"]},
+
+  {"filename": "simpsons_dataset.txt", "title": "Simpsons Dataset",
+    "author": "Matt Groening", "tags": ["american", "tv", "satire"]},
+
+  {"filename": "Irene Iddesleigh, by Amanda McKittrick Ros.txt", "title": "Irene Iddesleigh",
+    "author": "Amanda McKittrick Ros", "tags": ["irish", "romance", "biographical fiction"]},
+
+  {"filename": "The Eye of Argon, by Jim Theis.txt", "title": "The Eye of Argon",
+    "author": "Jim Theis", "tags": ["american", "fantasy", "adventure"]}
 ]}
