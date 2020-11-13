@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="Improve model and text generation">
-      <change afterPath="$PROJECT_DIR$/saved_models/model_model.bin" afterDir="false" />
+    <list default="true" id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/corpus_directory.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/corpus_directory.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saved_models/model.bin" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saved_models/model_grams.txt" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model_grams.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saved_models/model_model.model" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model_model.model" afterDir="false" />
