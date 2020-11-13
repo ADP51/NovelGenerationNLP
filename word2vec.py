@@ -21,8 +21,12 @@ df.isnull().sum()
 df = df.dropna().reset_index(drop=True)
 df.isnull().sum()
 
-print("Cleaning up... this will take a couple minutes.")
-nlp = spacy.load('en', disable=['ner', 'parser'])
+# Ensuring correct model is loaded in
+if spacy.util.is_package('en'):
+    nlp = spacy.load('en', disable=['ner', 'parser'])
+
+elif spacy.util.is_package('en_core_web_sm'):
+    nlp = spacy.load('en_core_web_sm', disable=['ner', 'parser'])
 
 
 def cleaning(doc):
@@ -36,6 +40,7 @@ def cleaning(doc):
 # Remove special char's
 quick_cleaning = (re.sub("[^A-Za-z']+", ' ', str(row)).lower() for row in df['spoken_words'])
 
+
 # https://spacy.io/usage/spacy-101#pipelines
 txt = [cleaning(doc) for doc in nlp.pipe(quick_cleaning, batch_size=5000, n_threads=-1)]
 
@@ -44,12 +49,12 @@ print('Time to clean: {} min'.format(round((time()- t)/60,2)))
 df_clean = pd.DataFrame({'clean': txt})
 df_clean = df_clean.dropna().drop_duplicates()
 
-print("Begin training...")
-#https://radimrehurek.com/gensim/models/phrases.html
+
+# https://radimrehurek.com/gensim/models/phrases.html
 # Automatically detect common phrases – aka multi-word expressions, word n-gram collocations – from a stream of sentences.
 sent = [row.split() for row in df_clean['clean']]
 
-phrases = Phrases (sent, min_count=30, progress_per=10000)
+phrases = Phrases(sent, min_count=30, progress_per=10000)
 
 bigram = Phraser(phrases)
 
