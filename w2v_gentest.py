@@ -1,3 +1,4 @@
+# TODO: investigate https://www.tensorflow.org/tutorials/text/text_generation
 
 import numpy as np
 import gensim
@@ -9,17 +10,22 @@ from unidecode import unidecode
 from keras.callbacks import LambdaCallback
 from keras.layers.recurrent import LSTM
 from keras.layers.embeddings import Embedding
+from keras.layers.recurrent import GRU
 from keras.layers import Dense, Activation
 from keras.models import Sequential
 from keras.utils.data_utils import get_file
 from gensim.models import Word2Vec
 
+batch_size = 1
 model_file = './saved_models/model_model.model'
 grams_file = './saved_models/model_grams.txt'
 
 word_model = Word2Vec.load(model_file)
 with open(grams_file, "rb") as fp:
     grams = pickle.load(fp)
+
+# limit input samples to a multiple of batch size
+grams = grams[:batch_size*round(len(grams)/batch_size)]
 
 pretrained_weights = word_model.wv.syn0
 vocab_size, emdedding_size = pretrained_weights.shape
@@ -38,8 +44,11 @@ def idx2word(idx):
     return word_model.wv.index2word[idx]
 
 
+gram_len = max(len(s) for s in grams)
+
+print('\nMax length is: ', gram_len)
 print('\nPreparing the data for LSTM...')
-train_x = np.zeros([len(grams), 80], dtype=np.int32)
+train_x = np.zeros([len(grams), gram_len], dtype=np.int32)
 train_y = np.zeros([len(grams)], dtype=np.int32)
 for i, sentence in enumerate(grams):
     for t, word in enumerate(sentence[:-1]):
@@ -51,7 +60,7 @@ print('train_y shape:', train_y.shape)
 print('\nTraining LSTM...')
 model = Sequential()
 model.add(Embedding(input_dim=vocab_size, output_dim=emdedding_size, weights=[pretrained_weights]))
-model.add(LSTM(units=emdedding_size))
+model.add(GRU(1024, return_sequences=False, recurrent_initializer='glorot_uniform'))
 model.add(Dense(units=vocab_size))
 model.add(Activation('softmax'))
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
@@ -94,6 +103,6 @@ def on_epoch_end(epoch, _):
 
 
 model.fit(train_x, train_y,
-          batch_size=128,
-          epochs=80,
+          batch_size=64,
+          epochs=40,
           callbacks=[LambdaCallback(on_epoch_end=on_epoch_end)])

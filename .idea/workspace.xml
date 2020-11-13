@@ -2,18 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="Improve model and text generation">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saved_models/model.bin" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model.bin" afterDir="false" />
-    </list>
-    <list id="b54f37e6-a1fe-42ec-a74e-fa0c761e3d63" name="Improve model and text generation" comment="">
       <change afterPath="$PROJECT_DIR$/saved_models/model_model.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/saved_models/model_output_2020-10-21.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/saved_models/model_output_2020-11-03.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/saved_models/model.bin" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saved_models/model_grams.txt" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model_grams.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saved_models/model_model.model" beforeDir="false" afterPath="$PROJECT_DIR$/saved_models/model_model.model" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/w2v_gentest.py" beforeDir="false" afterPath="$PROJECT_DIR$/w2v_gentest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/w2v_modeltest.py" beforeDir="false" afterPath="$PROJECT_DIR$/w2v_modeltest.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,6 +93,9 @@
       <module name="NLPproject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -118,6 +115,9 @@
       <module name="NLPproject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -215,7 +215,6 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="869994ac-8767-4d16-99e8-f5a89821a22d" name="Default Changelist" comment="" />
-      <changelist id="b54f37e6-a1fe-42ec-a74e-fa0c761e3d63" name="Improve model and text generation" comment="" />
       <created>1581700095261</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -237,7 +236,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604553415828</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Improve model and text generation">
+      <created>1604554793676</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1604554793676</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -266,10 +272,10 @@
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
     <state x="4063" y="1140" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1601953692537" />
-    <state x="4208" y="1080" width="744" height="808" key="CommitChangelistDialog2" timestamp="1604554585314">
+    <state x="4208" y="1080" width="744" height="808" key="CommitChangelistDialog2" timestamp="1604554789039">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
-    <state x="4208" y="1080" width="744" height="808" key="CommitChangelistDialog2/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604554585314" />
+    <state x="4208" y="1080" width="744" height="808" key="CommitChangelistDialog2/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604554789039" />
     <state x="4388" y="1207" key="RollbackChangesDialog" timestamp="1604554449509">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
@@ -282,18 +288,18 @@
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
     <state x="4458" y="1401" key="VCS.ChangelistChooser/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604554558530" />
-    <state x="4201" y="1218" key="Vcs.Push.Dialog.v2" timestamp="1604553488279">
+    <state x="4201" y="1218" key="Vcs.Push.Dialog.v2" timestamp="1604554806029">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
-    <state x="4201" y="1218" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604553488279" />
+    <state x="4201" y="1218" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604554806029" />
     <state width="775" height="419" key="XDebugger.FullValuePopup" timestamp="1604451430809">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
     <state width="775" height="419" key="XDebugger.FullValuePopup/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604451430809" />
-    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog" timestamp="1604433009893">
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog" timestamp="1605301114760">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
-    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1604433009893" />
+    <state x="4305" y="1310" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/3840.1072.1536.824@3840.1072.1536.824" timestamp="1605301114760" />
     <state x="4380" y="1380" key="git4idea.ui.GitResetDialog" timestamp="1604554482286">
       <screen x="3840" y="1072" width="1536" height="824" />
     </state>
