@@ -12,6 +12,4 @@ w2v_gen.py
 /saved_models/model_model.model
 /saved_models/model_model.model.trainables.syn1neg.npy
 /saved_models/model_model.model.wv.vectors.npy
-/.idea/*
-/.idea/workspace.xml
 /test_models/*
