@@ -16,22 +16,25 @@ from keras.models import Sequential
 from keras.utils.data_utils import get_file
 from gensim.models import Word2Vec
 
-batch_size = 1
-model_file = './saved_models/model_model.model'
-grams_file = './saved_models/model_grams.txt'
+EPOCHS = 30        # EPOCHS is the amount of times the model is trained
+BATCH_SIZE = 256    # number of samples that will be propagated through the network
+RNN_UNITS = 1024    # Number of RNN units
+
+model_file = 'E:/NovelGenerationNLP/test_models/doyle_model.model'
+grams_file = 'E:/NovelGenerationNLP/test_models/doyle_grams.txt'
 
 word_model = Word2Vec.load(model_file)
 with open(grams_file, "rb") as fp:
     grams = pickle.load(fp)
 
 # limit input samples to a multiple of batch size
-grams = grams[:batch_size*round(len(grams)/batch_size)]
+grams = grams[:BATCH_SIZE*round(len(grams)/BATCH_SIZE)]
 
 pretrained_weights = word_model.wv.syn0
 vocab_size, emdedding_size = pretrained_weights.shape
 print('Result embedding shape:', pretrained_weights.shape)
 print('Checking similar words:')
-for word in ['homer', 'donut', 'duff', 'mayor']:
+for word in ['holmes', 'mystery', 'gun', 'woman']:
     most_similar = ', '.join('%s (%.2f)' % (similar, dist) for similar, dist in word_model.most_similar(word)[:8])
     print('  %s -> %s' % (word, most_similar))
 
@@ -60,7 +63,7 @@ print('train_y shape:', train_y.shape)
 print('\nTraining LSTM...')
 model = Sequential()
 model.add(Embedding(input_dim=vocab_size, output_dim=emdedding_size, weights=[pretrained_weights]))
-model.add(GRU(1024, return_sequences=False, recurrent_initializer='glorot_uniform'))
+model.add(GRU(RNN_UNITS, return_sequences=False, recurrent_initializer='glorot_uniform'))
 model.add(Dense(units=vocab_size))
 model.add(Activation('softmax'))
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
@@ -89,13 +92,13 @@ def generate_next(text, num_generated=16):
 def on_epoch_end(epoch, _):
     print('\nGenerating text after epoch: %d' % epoch)
     texts = [
-        'homer',
-        'duff',
-        'donut',
-        'mayor',
-        'bart',
-        'hello',
-        'kill'
+        'holmes',
+        'watson',
+        'gun',
+        'war',
+        'mystery',
+        'murder',
+        'woman'
     ]
     for text in texts:
         sample = generate_next(text)
@@ -103,6 +106,6 @@ def on_epoch_end(epoch, _):
 
 
 model.fit(train_x, train_y,
-          batch_size=64,
-          epochs=40,
+          batch_size=BATCH_SIZE,
+          epochs=EPOCHS,
           callbacks=[LambdaCallback(on_epoch_end=on_epoch_end)])
