@@ -343,6 +343,20 @@
   {"filename": "simpsons_dataset.txt", "title": "Simpsons Dataset",
     "author": "Matt Groening", "tags": ["american", "tv", "satire"]},
 
+  {"filename": "The Complete Works of William Shakespeare, by William Shakespeare.txt", "title": "The Complete Works of William Shakespeare",
+    "author": "William Shakespeare", "tags": ["english", "play", "romance", "poetry"]},
+
+  {"filename": "The Works of Edgar Allan Poe, Volume 1, by Edgar Allan Poe.txt", "title": "The Works of Edgar Allan Poe, Volume 1",
+    "author": "Edgar Allan Poe", "tags": ["english", "horror", "poetry"]},
+  {"filename": "The Works of Edgar Allan Poe, Volume 2, by Edgar Allan Poe.txt", "title": "The Works of Edgar Allan Poe, Volume 2",
+    "author": "Edgar Allan Poe", "tags": ["english", "horror", "poetry"]},
+  {"filename": "The Works of Edgar Allan Poe, Volume 3, by Edgar Allan Poe.txt", "title": "The Works of Edgar Allan Poe, Volume 3",
+    "author": "Edgar Allan Poe", "tags": ["english", "horror", "poetry"]},
+  {"filename": "The Works of Edgar Allan Poe, Volume 4, by Edgar Allan Poe.txt", "title": "The Works of Edgar Allan Poe, Volume 4",
+    "author": "Edgar Allan Poe", "tags": ["english", "horror", "poetry"]},
+  {"filename": "The Works of Edgar Allan Poe, Volume 5, by Edgar Allan Poe.txt", "title": "The Works of Edgar Allan Poe, Volume 5",
+    "author": "Edgar Allan Poe", "tags": ["english", "horror", "poetry"]},
+
   {"filename": "Irene Iddesleigh, by Amanda McKittrick Ros.txt", "title": "Irene Iddesleigh",
     "author": "Amanda McKittrick Ros", "tags": ["irish", "romance", "biographical fiction"]},
 

@@ -15,7 +15,7 @@ class Corpus(object):
     def full_combined_string(self):
         combined = ''
         for elem in self.full_file_list():
-            with open(elem) as f:
+            with open(elem, encoding='utf-8') as f:
                 combined += '{}\n'.format(f.read())
         return combined
 
@@ -25,7 +25,7 @@ class Corpus(object):
     def author_combined_string(self, author):
         combined = ''
         for elem in self.author_file_list(author):
-            with open(elem) as f:
+            with open(elem, encoding='utf-8') as f:
                 combined += '{}\n'.format(f.read())
         return combined
 
@@ -35,7 +35,7 @@ class Corpus(object):
     def tag_combined_string(self, tag):
         combined = ''
         for elem in self.tag_file_list(tag):
-            with open(elem) as f:
+            with open(elem, encoding='utf-8') as f:
                 combined += '{}\n'.format(f.read())
         return combined
 
