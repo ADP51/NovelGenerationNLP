@@ -8,6 +8,7 @@ from itertools import islice
 
 from unidecode import unidecode
 from keras.callbacks import LambdaCallback
+from keras.callbacks import ModelCheckpoint
 from keras.layers.recurrent import LSTM
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import GRU
@@ -16,12 +17,15 @@ from keras.models import Sequential
 from keras.utils.data_utils import get_file
 from gensim.models import Word2Vec
 
-EPOCHS = 30        # EPOCHS is the amount of times the model is trained
+
+
+EPOCHS = 80        # EPOCHS is the amount of times the model is trained
 BATCH_SIZE = 256    # number of samples that will be propagated through the network
 RNN_UNITS = 1024    # Number of RNN units
 
 model_file = 'E:/NovelGenerationNLP/test_models/doyle_model.model'
 grams_file = 'E:/NovelGenerationNLP/test_models/doyle_grams.txt'
+chkpt_file = 'E:/NovelGenerationNLP/test_models/arthur-conan-doyle_model.ckpt'
 
 word_model = Word2Vec.load(model_file)
 with open(grams_file, "rb") as fp:
@@ -105,7 +109,10 @@ def on_epoch_end(epoch, _):
         print('%s... -> %s' % (text, sample))
 
 
+# Create a callback that saves the model's weights
+model_callback = ModelCheckpoint(filepath=chkpt_file, save_weights_only=True, verbose=1)
+
 model.fit(train_x, train_y,
           batch_size=BATCH_SIZE,
           epochs=EPOCHS,
-          callbacks=[LambdaCallback(on_epoch_end=on_epoch_end)])
+          callbacks=[model_callback, LambdaCallback(on_epoch_end=on_epoch_end)])
