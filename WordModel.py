@@ -1,38 +1,22 @@
 
-import numpy as np
-import gensim
 import pickle
-import string
+import textwrap
 from itertools import islice
+from time import time
 
-from unidecode import unidecode
+import numpy as np
+import spacy
+from gensim.models import Word2Vec
+from gensim.models.phrases import Phrases, Phraser
 from keras.callbacks import LambdaCallback
 from keras.callbacks import ModelCheckpoint
-from keras.layers.recurrent import LSTM
+from keras.layers import Dense, Activation
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import GRU
-from keras.layers import Dense, Activation
 from keras.models import Sequential
-from keras.utils.data_utils import get_file
-from gensim.models import Word2Vec
-
-import re
-import pandas as pd
-import pickle
-from time import time
-from itertools import islice
-import string
-import textwrap
 from unidecode import unidecode
-from collections import defaultdict
-from gensim.models.phrases import Phrases, Phraser
-from gensim.models import Word2Vec
-from gensim.models import KeyedVectors
-from corpus import Corpus
 
-import spacy
-import logging
-import sys
+from corpus import Corpus
 
 
 class WordModel:
@@ -45,6 +29,7 @@ class WordModel:
 
 
         self.nlp = None
+        self.phraser = None
         # A list of gram-sentences used as a dataset for the Word2Vec and machine learning models
         self.grams = None
         # The Word2Vec model that will generate word vectors
@@ -109,9 +94,12 @@ class WordModel:
 
     # TODO: Check if a better w2v model can be created by increasing the window size from 2
     # TODO: Experiment with other w2v parameters
+    # TODO: "Improve text processing" - find a way to keep pronouns / conjugations of "be" and so forth
+    # TODO: "Improving training sets" - create a larger set of smaller, staggered sentences.
+    #       Perhaps 10-20 words long, staggered every 5 words. Also experiment with staggering by 1 and 2 words.
     def w2v_grams(self, corpus_file: str = './data/corpus_directory.json', corpus_dir: str = './data/corpus/',
                   author: str = None, genre: str = None, log: bool = True, sentence_len: int = 40,
-                  phrase_min_count: int = 20, phrase_threshold: int = 20, ):
+                  sentence_offset: int = 5, phrase_min_count: int = 20, phrase_threshold: int = 2, ):
         """"""
 
         # Check if arguments make sense
@@ -134,6 +122,9 @@ class WordModel:
             print(docs[sentence_len * 2:sentence_len * 4], '...')
             print(docs[sentence_len * 4:sentence_len * 6], '...')
 
+        if log:
+            print("\n== CLEANING ==")
+
         # Further cleaning, lower-casing and removal of punctuation
         # (except for periods, exclamation and question points, and apostrophes)
         sent_clean = docs.lower().translate(str.maketrans('', '', '~@#$%^&*()+=_",/\\:;{}[]<>')).rstrip()
@@ -145,6 +136,9 @@ class WordModel:
             print(sent_clean[:sentence_len * 2], '...')
             print(sent_clean[sentence_len * 2:sentence_len * 4], '...')
             print(sent_clean[sentence_len * 4:sentence_len * 6], '...')
+
+        if log:
+            print("\n== LEMMATIZING ==")
 
         self._w2v_load_spacy()
 
@@ -158,10 +152,13 @@ class WordModel:
 
         if log:
             # Print out samples of lemmatized text
-            # TODO: Fix this, currently spits out two empty lines followed by 'i'
             print("Lemmatized samples: ")
-            for line in islice(sent_lemma, 0, 3):
-                print(line)
+            print(sent_lemma[:sentence_len * 2], '...')
+            print(sent_lemma[sentence_len * 2:sentence_len * 4], '...')
+            print(sent_lemma[sentence_len * 4:sentence_len * 6], '...')
+
+        if log:
+            print("\n== GRAMMATIZING ==")
 
         sent_split = sent_lemma.split()
 
@@ -174,30 +171,101 @@ class WordModel:
                           threshold=phrase_threshold)
         bigram = Phraser(phrases)
 
+        self.phraser = bigram
+
         # Trim ngram sentence length and remove empty lists
         sent_gram = bigram[sent_split]
 
-        # Final chunking of sentence list
-        sent_arr_gram = list(self._chunks(sent_gram, sentence_len))
+        sent_arr_gram = []
 
-        # if model_name:
-        #     # Save ngram list to file for later use
-        #     with open('{}{}_grams.txt'.format(model_dir, model_name), 'wb') as fp:
-        #         pickle.dump(sent_arr_gram, fp)
+        offset = 0
+        # Final chunking of sentence list
+        for i in range(int(sentence_len/sentence_offset)):
+            if log:
+                print("Chunking loop={} offset={} next{}words={}".format(i, offset, sentence_offset+1,
+                                                                         sent_gram[offset:offset+sentence_offset+1]))
+            sent_arr_gram += list(self._chunks(sent_gram[offset:], sentence_len))
+            offset += sentence_offset
+
+        # sent_arr_gram = list(self._chunks(sent_gram, sentence_len))
 
         self.grams = sent_arr_gram
 
         if log:
             # Print out samples of n-grammed text
-            print("N-gram samples: ")
+            print("\nChunked samples: ")
             for line in islice(sent_arr_gram, 0, 3):
                 print(line)
 
         if log:
             print('Time to grammatize: {} min'.format(round((time() - t) / 60, 2)))
 
+    def w2v_seeds(self, text: list, log: bool = True, save: bool = True):
+        """"""
+
+        t = time()
+
+        docs = [unidecode(doc) for doc in text]
+
+        if log:
+            # Print out sample lines of unaltered input text
+            print("\nRaw lines: ")
+            for line in docs:
+                print(line)
+
+        # Further cleaning, lower-casing and removal of punctuation
+        # (except for periods, exclamation and question points, and apostrophes)
+        sent_clean = [doc.lower().translate(str.maketrans('', '', '~@#$%^&*()+=_",/\\:;{}[]<>')).rstrip() for doc in docs]
+        sent_clean = [doc.replace('\n', ' ').replace('-', ' ') for doc in sent_clean]
+
+        if log:
+            # Print out samples of cleaned and formatted text
+            print("\nCleaned lines: ")
+            for line in sent_clean:
+                print(line)
+
+        self._w2v_load_spacy()
+
+        sent_lemma = [self._w2v_lemmatize(doc) for doc in sent_clean]
+
+        if log:
+            print('\nTime to lemmatize: {} min'.format(round((time() - t) / 60, 2)))
+        t = time()
+
+        if log:
+            # Print out samples of lemmatized text
+            print("Lemmatized samples: ")
+            for line in sent_lemma:
+                print(line)
+
+        sent_split = [doc.split() for doc in sent_lemma]
+
+        # Trim ngram sentence length and remove empty lists
+        sent_gram = [self.phraser[doc] for doc in sent_split]
+
+        if log:
+            # Print out samples of n-grammed text
+            print("\nN-gram samples: ")
+            for line in sent_gram:
+                print(line)
+
+        if log:
+            print('Time to grammatize: {} min'.format(round((time() - t) / 60, 2)))
+
+        if save:
+            seed_file = '{}{}_seeds.txt'.format(self.model_dir, self.model_name)
+            with open(seed_file, 'w') as f:
+                for line in sent_gram:
+                    out = ''
+                    for word in line:
+                        out += word + ' '
+                    out += '\n'
+                    f.write(out)
+
+        return sent_gram
+
     def w2v_train(self, log: bool = True, min_count: int = 1, window: int = 2, sample: float = 6e-5,
-                  alpha: float = 0.03, min_alpha: float = 0.0007, negative: int = 20, workers: int = 2):
+                  alpha: float = 0.03, min_alpha: float = 0.0007, negative: int = 20, workers: int = 4):
 
         t = time()
 
@@ -210,14 +278,13 @@ class WordModel:
             print('Time to build vocab: {} mins'.format(round((time() - t) / 60, 2)))
         t = time()
 
-        w2v_model.train(self.grams, total_examples=w2v_model.corpus_count, epochs=60, report_delay=1)
+        w2v_model.train(self.grams, total_examples=w2v_model.corpus_count, epochs=30, report_delay=1)
 
         if log:
             print('Time to train the model: {} mins'.format(round((time() - t) / 60, 2)))
 
-        if self.model_name:
-            # TODO: Use self.w2v_model_to_file
-            w2v_model.save('{}{}_model.model'.format(self.model_dir, self.model_name))
+        # if self.model_name:
+        #     w2v_model.save('{}{}_model.model'.format(self.model_dir, self.model_name))
 
         w2v_model.init_sims(replace=True)
 
@@ -231,14 +298,6 @@ class WordModel:
                   optimizer: str = 'adam', loss_algorithm: str = 'sparse_categorical_crossentropy'):
         """"""
 
-        model_file = 'E:/NovelGenerationNLP/test_models/doyle_model.model'
-        grams_file = 'E:/NovelGenerationNLP/test_models/doyle_grams.txt'
-        chkpt_file = 'E:/NovelGenerationNLP/test_models/arthur-conan-doyle_model.ckpt'
-
-        # word_model = Word2Vec.load(model_file)
-        # with open(grams_file, "rb") as fp:
-        #     grams = pickle.load(fp)
-
         # limit input samples to a multiple of batch size
         grams = self.grams[:batch_size * round(len(self.grams) / batch_size)]
 
@@ -250,21 +309,10 @@ class WordModel:
             print('Checking similar words:')
             self._w2v_word_similarities(8)
 
-        # for word in ['holmes', 'mystery', 'gun', 'woman']:
-        #     most_similar = ', '.join(
-        #         '%s (%.2f)' % (similar, dist) for similar, dist in word_model.most_similar(word)[:8])
-        #     print('  %s -> %s' % (word, most_similar))
-
-        # def word2idx(word):
-        #     return word_model.wv.vocab[word].index
-        #
-        # def idx2word(idx):
-        #     return word_model.wv.index2word[idx]
-
         gram_len = max(len(s) for s in grams)
 
         print('\nMax length is: ', gram_len)
-        print('\nPreparing the data for LSTM...')
+        print('Preparing the data for LSTM...')
         train_x = np.zeros([len(grams), gram_len], dtype=np.int32)
         train_y = np.zeros([len(grams)], dtype=np.int32)
         for i, sentence in enumerate(grams):
@@ -285,43 +333,11 @@ class WordModel:
 
         self.model = model
 
-        # def sample(preds, temperature=1.0):
-        #     if temperature <= 0:
-        #         return np.argmax(preds)
-        #     preds = np.asarray(preds).astype('float64')
-        #     preds = np.log(preds) / temperature
-        #     exp_preds = np.exp(preds)
-        #     preds = exp_preds / np.sum(exp_preds)
-        #     probas = np.random.multinomial(1, preds, 1)
-        #     return np.argmax(probas)
-        #
-        # def generate_next(text, num_generated=16):
-        #     word_idxs = [word2idx(word) for word in text.lower().split()]
-        #     for i in range(num_generated):
-        #         prediction = model.predict(x=np.array(word_idxs))
-        #         idx = sample(prediction[-1], temperature=0.7)
-        #         word_idxs.append(idx)
-        #     return ' '.join(idx2word(idx) for idx in word_idxs)
-        #
-        # def on_epoch_end(epoch, _):
-        #     print('\nGenerating text after epoch: %d' % epoch)
-        #     texts = [
-        #         'holmes',
-        #         'watson',
-        #         'gun',
-        #         'war',
-        #         'mystery',
-        #         'murder',
-        #         'woman'
-        #     ]
-        #     for text in texts:
-        #         sample = generate_next(text)
-        #         print('%s... -> %s' % (text, sample))
-
         # "callbacks" being a list of functions
         # Create a callback that generates sample output
         callbacks = [LambdaCallback(on_epoch_end=self._gen_on_epoch_end)]
 
+        # https://www.tensorflow.org/tutorials/keras/save_and_load#save_checkpoints_during_training
         if self.model_name and self.model_dir:
             # Create a callback that saves the model's weights
             ckpt_file = '{}{}_model.ckpt'.format(self.model_dir, self.model_name)
