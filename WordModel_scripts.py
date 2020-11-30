@@ -23,7 +23,7 @@ def doyle_test1():
     return test
 
 
-def arthur_conan_doyle():
+def arthur_conan_doyle_w2v():
     test = WordModel('arthur-conan-doyle', 'E:/NovelGenerationNLP/test_models/',
                      ['holmes', 'watson', 'gun', 'war', 'mystery', 'murder', 'woman'])
 
@@ -31,16 +31,30 @@ def arthur_conan_doyle():
     test.w2v_grams_to_file()
     test.w2v_train(workers=6)
     test.w2v_model_to_file()
-    test.gen_train(epochs=80, batch_size=4096, rnn_units=128)
-    test.w2v_seeds(['Elementary, my dear Watson.', 'When you have eliminated all which is impossible,',
-                    'There is nothing more deceptive than an obvious fact.', 'You see, but you do not observe.',
+
+    test.w2v_seeds(['Elementary, my dear Watson.',
+                    'When you have eliminated all which is impossible,',
+                    'There is nothing more deceptive than an obvious fact.',
+                    'You see, but you do not observe.',
                     'Take a community of Dutchmen of the type of those who defended themselves',
                     'My name is Sherlock Holmes.'
                     ], log=False)
 
     return test
 
-def mark_twain():
+
+def arthur_conan_doyle_gen(epochs: int = 40):
+    test = WordModel('arthur-conan-doyle', 'E:/NovelGenerationNLP/test_models/',
+                     ['holmes', 'watson', 'gun', 'war', 'mystery', 'murder', 'woman'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/arthur-conan-doyle_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/arthur-conan-doyle_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
+    return test
+
+
+def mark_twain_w2v():
     test = WordModel('mark-twain', 'E:/NovelGenerationNLP/test_models/',
                      ['sawyer', 'science', 'story', 'war', 'mississippi', 'america', 'woman'])
 
@@ -48,7 +62,7 @@ def mark_twain():
     test.w2v_grams_to_file()
     test.w2v_train(workers=6)
     test.w2v_model_to_file()
-    test.gen_train(epochs=80, batch_size=4096, rnn_units=128)
+
     test.w2v_seeds(['It is a time when one’s spirit is subdued and sad',
                     'If you should rear a duck in the heart of the Sahara',
                     'Now and then we had a hope that if we lived and were good',
@@ -59,7 +73,19 @@ def mark_twain():
 
     return test
 
-def simpsons():
+
+def mark_twain_gen(epochs: int = 40):
+    test = WordModel('mark-twain', 'E:/NovelGenerationNLP/test_models/',
+                     ['sawyer', 'science', 'story', 'war', 'mississippi', 'america', 'woman'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/mark-twain_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/mark-twain_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=1024, rnn_units=64)
+
+    return test
+
+def simpsons_w2v():
     test = WordModel('simpsons', 'E:/NovelGenerationNLP/test_models/',
                      ['homer', 'donut', 'duff', 'kill', 'mayor', 'prank', 'springfield'])
 
@@ -67,7 +93,7 @@ def simpsons():
     test.w2v_grams_to_file()
     test.w2v_train(workers=6)
     test.w2v_model_to_file()
-    test.gen_train(epochs=80, batch_size=4096, rnn_units=128)
+
     test.w2v_seeds(['We were gonna keep the gray one, but the mother ate her',
                     'You see, class, my Lyme Disease turned out to be psychosomatic',
                     'Alright, alright, spilled milk, spilled milk, spilled milk...',
@@ -78,7 +104,19 @@ def simpsons():
 
     return test
 
-def william_shakespeare():
+
+def simpsons_gen(epochs: int = 40):
+    test = WordModel('simpsons', 'E:/NovelGenerationNLP/test_models/',
+                     ['homer', 'donut', 'duff', 'kill', 'mayor', 'prank', 'springfield'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/simpsons_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/simpsons_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
+
+    return test
+
+def william_shakespeare_w2v():
     test = WordModel('william-shakespeare', 'E:/NovelGenerationNLP/test_models/',
                      ['romeo', 'thumb', 'wicked', 'world', 'love', 'beware', 'havoc'])
 
@@ -86,7 +124,7 @@ def william_shakespeare():
     test.w2v_grams_to_file()
     test.w2v_train(workers=6)
     test.w2v_model_to_file()
-    test.gen_train(epochs=80, batch_size=4096, rnn_units=128)
+
     test.w2v_seeds(['All that glitters is not gold',
                     'Hell is empty and all the devils are here.',
                     'By the pricking of my thumbs, Something wicked this way comes.',
@@ -97,7 +135,20 @@ def william_shakespeare():
 
     return test
 
-def edgar_allan_poe():
+
+def william_shakespeare_gen(epochs: int = 40):
+    test = WordModel('william-shakespeare', 'E:/NovelGenerationNLP/test_models/',
+                     ['romeo', 'thumb', 'wicked', 'world', 'love', 'beware', 'havoc'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/william-shakespeare_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/william-shakespeare_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
+
+    return test
+
+
+def edgar_allan_poe_w2v():
     test = WordModel('edgar-allan-poe', 'E:/NovelGenerationNLP/test_models/',
                      ['raven', 'heart', 'death', 'insane', 'love', 'sea', 'beauty'])
 
@@ -105,7 +156,7 @@ def edgar_allan_poe():
     test.w2v_grams_to_file()
     test.w2v_train(workers=6)
     test.w2v_model_to_file()
-    test.gen_train(epochs=80, batch_size=4096, rnn_units=128)
+
     test.w2v_seeds(['Those who dream by day are cognizant of many things',
                     'I have great faith in fools - self-confidence my friends will call it',
                     'Once upon a midnight dreary, while I pondered, weak and weary,',
@@ -114,8 +165,49 @@ def edgar_allan_poe():
                     'The true genius shudders at incompleteness'
                     ], log=False)
 
-    # test.w2v_model_to_file()
-    # test.w2v_grams_to_file()
+    return test
+
+
+def edgar_allan_poe_gen(epochs: int = 40):
+    test = WordModel('edgar-allan-poe', 'E:/NovelGenerationNLP/test_models/',
+                     ['raven', 'heart', 'death', 'insane', 'love', 'sea', 'beauty'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/edgar-allan-poe_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/edgar-allan-poe_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
+
+    return test
+
+
+def amanda_mckittrick_ros_w2v():
+    test = WordModel('amanda-mckittrick-ros', 'E:/NovelGenerationNLP/test_models/',
+                     ['glory', 'fortune', 'house', 'summer', 'love', 'my', 'beauty'])
+
+    test.w2v_grams(author='Amanda McKittrick Ros', sentence_len=8, sentence_offset=1)
+    test.w2v_grams_to_file()
+    test.w2v_train(workers=6)
+    test.w2v_model_to_file()
+
+    test.w2v_seeds(['When on the eve of glory, whilst brooding over the prospects of a bright and happy future,',
+                    'Sympathise with me, indeed! Ah, no!',
+                    'The December sun had hidden its dull rays behind the huge rocks that rose monstrously high',
+                    'Arouse the seeming deadly creature to that standard of joy and gladness which should mark his noble path!',
+                    'The silvery touch of fortune is too often gilt with betrayal',
+                    'Our hopes when elevated to that standard of ambition which demands unison may fall asunder like an ancient ruin.'
+                    ], log=False)
+
+    return test
+
+
+def amanda_mckittrick_ros_gen(epochs: int = 40):
+    test = WordModel('amanda-mckittrick-ros', 'E:/NovelGenerationNLP/test_models/',
+                     ['glory', 'fortune', 'house', 'summer', 'love', 'my', 'beauty'])
+
+    test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/amanda-mckittrick-ros_grams.txt')
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/amanda-mckittrick-ros_model.model')
+
+    test.gen_train(epochs=epochs, batch_size=1024, rnn_units=64)
 
     return test
 
