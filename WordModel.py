@@ -13,6 +13,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Activation
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import GRU
+from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from unidecode import unidecode
 
@@ -323,10 +324,14 @@ class WordModel:
         print('train_x shape:', train_x.shape)
         print('train_y shape:', train_y.shape)
 
+        for ex, ey in zip(train_x[:3], train_y[:3]):
+            print("X: {}".format([self._gen_idx2word(idx) for idx in ex]))
+            print("Y: {}".format(self._gen_idx2word(ey)))
+
         print('\nTraining LSTM...')
         model = Sequential()
         model.add(Embedding(input_dim=vocab_size, output_dim=emdedding_size, weights=[pretrained_weights]))
-        model.add(GRU(rnn_units, return_sequences=False, recurrent_initializer=recurrent_initializer))
+        model.add(LSTM(rnn_units, return_sequences=False, recurrent_initializer=recurrent_initializer))
         model.add(Dense(units=vocab_size))
         model.add(Activation(activation))
         model.compile(optimizer=optimizer, loss=loss_algorithm)
@@ -359,16 +364,90 @@ class WordModel:
 
     def _w2v_lemmatize(self, doc):
         """"""
+        # Begin lemmatization and removing stopwords - keeping pronouns and "be" conjugations
+        # txt = [token.lemma_ for token in self.nlp(doc)]
 
-        # Begin lemmatization and removing stopwords
-        txt = [token.lemma_ for token in self.nlp(doc)]
-        # TODO: Don't lemmatize pronouns - some other system to condense them, while retaining the actual word?
-        #  I, you, they? Or do they even need to be condensed?
-        #  Perhaps expand list comprehension above to a proper for loop, so individual tokens can be assessed.
+        txt = []
 
-        # Remove any sentence less than 2 words
+        for token in self.nlp(doc):
+            if token.lemma_ == '-PRON-':
+                pron = self._w2v_pron(token.lower_)
+                if pron:
+                    txt.append(pron)
+            elif token.lemma_ == 'be':
+                be = self._w2v_be(token.lower_)
+                if be:
+                    txt.append(be)
+            else:
+                txt.append(token.lemma_)
+
+        # Remove any sentence of two words or less
         if len(txt) > 2:
             return ' '.join(txt)
+
+    @staticmethod
+    def _w2v_pron(text):
+        if text in ['i']:
+            return 'i'
+        elif text in ['me', 'myself']:
+            return 'me'
+        elif text in ['my', 'mine']:
+            return 'my'
+        elif text in ['you', 'yourself']:
+            return 'you'
+        elif text in ['your', 'yours']:
+            return 'your'
+        elif text in ['he']:
+            return 'he'
+        elif text in ['him', 'himself']:
+            return 'himself'
+        elif text in ['his']:
+            return 'his'
+        elif text in ['she']:
+            return 'she'
+        elif text in ['her', 'herself']:
+            return 'her'
+        elif text in ['hers']:
+            return 'hers'
+        elif text in ['it', 'itself']:
+            return 'it'
+        elif text in ['its']:
+            return 'its'
+        elif text in ['we']:
+            return 'we'
+        elif text in ['us', 'ourselves']:
+            return 'us'
+        elif text in ['ours']:
+            return 'ours'
+        elif text in ['they']:
+            return 'they'
+        elif text in ['them', 'themselves']:
+            return 'them'
+        elif text in ['their', 'theirs']:
+            return 'their'
+        else:
+            return None
+
+    @staticmethod
+    def _w2v_be(text):
+        if text in ['be']:
+            return 'be'
+        if text in ['am']:
+            return 'am'
+        elif text in ['is']:
+            return 'is'
+        elif text in ['are']:
+            return 'are'
+        elif text in ['was']:
+            return 'was'
+        elif text in ['were']:
+            return 'were'
+        elif text in ['been']:
+            return 'been'
+        elif text in ['being']:
+            return 'being'
+        else:
+            return None
 
     def _w2v_word_similarities(self, len: int, custom_words: list = None):
         """"""
