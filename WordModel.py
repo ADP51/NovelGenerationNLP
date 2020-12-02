@@ -1,5 +1,6 @@
 
 import pickle
+import json
 import textwrap
 from itertools import islice
 from time import time
@@ -303,7 +304,7 @@ class WordModel:
         grams = self.grams[:batch_size * round(len(self.grams) / batch_size)]
 
         pretrained_weights = self.w2v.wv.syn0
-        vocab_size, emdedding_size = pretrained_weights.shape
+        vocab_size, embedding_size = pretrained_weights.shape
 
         if log:
             print('Result embedding shape:', pretrained_weights.shape)
@@ -330,11 +331,18 @@ class WordModel:
 
         print('\nTraining LSTM...')
         model = Sequential()
-        model.add(Embedding(input_dim=vocab_size, output_dim=emdedding_size, weights=[pretrained_weights]))
+        model.add(Embedding(input_dim=vocab_size, output_dim=embedding_size, weights=[pretrained_weights]))
         model.add(LSTM(rnn_units, return_sequences=False, recurrent_initializer=recurrent_initializer))
         model.add(Dense(units=vocab_size))
         model.add(Activation(activation))
         model.compile(optimizer=optimizer, loss=loss_algorithm)
+
+        print(model.summary())
+        json_config = model.to_json()
+        # print(json_config)
+
+        with open('{}{}_model.json'.format(self.model_dir, self.model_name), 'w') as file:
+            file.write(json_config)
 
         self.model = model
 
@@ -504,3 +512,20 @@ class WordModel:
         for text in self.sim_words:
             sample = self._gen_generate_next(text)
             print('%s... -> %s' % (text, sample))
+
+    @staticmethod
+    def _gen_create_model(w2v, rnn_units: int = 1024,
+                          recurrent_initializer: str = 'glorot_uniform', activation: str = 'softmax',
+                          optimizer: str = 'adam', loss_algorithm: str = 'sparse_categorical_crossentropy'):
+
+        pretrained_weights = w2v.wv.syn0
+        vocab_size, embedding_size = pretrained_weights.shape
+
+        model = Sequential()
+        model.add(Embedding(input_dim=vocab_size, output_dim=embedding_size))
+        model.add(LSTM(rnn_units, return_sequences=False, recurrent_initializer=recurrent_initializer))
+        model.add(Dense(units=vocab_size))
+        model.add(Activation(activation))
+        model.compile(optimizer=optimizer, loss=loss_algorithm)
+
+        return model

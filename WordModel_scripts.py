@@ -1,3 +1,5 @@
+from keras.models import model_from_json
+
 from WordModel import WordModel
 
 
@@ -81,7 +83,7 @@ def mark_twain_gen(epochs: int = 40):
     test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/mark-twain_grams.txt')
     test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/mark-twain_model.model')
 
-    test.gen_train(epochs=epochs, batch_size=1024, rnn_units=64)
+    test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
 
     return test
 
@@ -144,6 +146,31 @@ def william_shakespeare_gen(epochs: int = 40):
     test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/william-shakespeare_model.model')
 
     test.gen_train(epochs=epochs, batch_size=4096, rnn_units=64)
+
+    return test
+
+
+def william_shakespeare_output(seed: str):
+
+    test = WordModel('william-shakespeare', 'E:/NovelGenerationNLP/test_models/',
+                     ['romeo', 'thumb', 'wicked', 'world', 'love', 'beware', 'havoc'])
+
+    test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/william-shakespeare_model.model')
+
+    with open('E:/NovelGenerationNLP/test_models/william-shakespeare_model.json', 'r') as file:
+        json_config = file.read()
+
+    model_from_json()
+    test.model = model_from_json(json_config)
+
+    print(test.model.summary())
+
+    test.model.load_weights("E:/NovelGenerationNLP/test_models/william-shakespeare_model.ckpt")
+    #
+    # print(test.model.summary())
+
+    print(test._gen_generate_next(seed, num_generated=100))
+    # print(test._gen_generate_next("My name is William Shakespeare"))
 
     return test
 
