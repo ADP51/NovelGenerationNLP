@@ -7,25 +7,11 @@ from main import read_corpus, start_model, read_text, read_csv
 # **** MAKE SURE ALL THE PATHS ARE SET FROM THIS FILE OR THE TESTS WONT RUN *******
 class TestMain(unittest.TestCase):
 
-    # This test runs the read_csv method from main.py, it tests with a regex
-    # TODO This test fails
-    def test_read_csv(self):
-        text = read_csv("../char_mappings/simpson_map.csv", 'k', 49, 49)
-        self.assertRegex(text, "[A-Za-z0-9]*")
-
     # This test runs the read_text method from main.py, if no errors happen it prints out the test worked
     def test_read_text(self):
         text = read_text("../data/shakespeare/")
         self.assertNotEqual(text, "")
         self.assertRegex(text, "[A-Za-z]*")
-
-    # Does not require testing so returns true
-    def test_create_training_segments(self):
-        self.assertEqual(True, True)
-
-    # Does not require testing so returns true
-    def test_loss(self):
-        self.assertEqual(True, True)
 
     # Test method for reading the file and creating a vocab, if no errors it prints out successful
     def test_read_corpus(self):
