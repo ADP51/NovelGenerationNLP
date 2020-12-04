@@ -4,18 +4,13 @@ import unittest
 
 import numpy as np
 import tensorflow as tf
-from author_model import build_model, generate_text, train_model
-
+from author_model import build_model, generate_text
 
 # These tests are hard to test as they return models with variable information
 from main import read_corpus, start_model, loss, read_text
 
 
 class TestAuthorModel(unittest.TestCase):
-
-    # No test can be written for this method since nothing returned
-    def test_save_char_mapping(self):
-        self.assertEqual(True, True)
 
     # Tests the build a model method from author_model
     def test_build_model(self):
@@ -37,12 +32,12 @@ class TestAuthorModel(unittest.TestCase):
 
     # Tests the train model method from author_model.py
     # This test takes a while to run
-    # Deprecated, we don't use this method anymore
-    def test_train_model(self):
-
-        # new_model, char_idx, idx2char = generate_model()
-        # self.assertTrue(new_model.built)
-        self.assertTrue(True)
+    #################################################
+    # DEPRECATED, we don't use this method anymore
+    #################################################
+    # def test_train_model(self):
+    #     new_model, char_idx, idx2char = generate_model()
+    #     self.assertTrue(new_model.built)
 
     # This tests the generate_text method from the author_model.py, runs a regex check and then prints out the text
     # This test takes a while to
