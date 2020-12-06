@@ -74,7 +74,7 @@ class WordModel:
         with open('{}{}_grams.txt'.format(dir, name), 'wb') as fp:
             pickle.dump(self.grams, fp)
 
-    def w2v_model_to_file(self, custom_dir: str = None, custom_name: str = None):
+    def w2v_model_to_file(self, custom_dir: str = None, custom_name: str = None, sep_limit: int = 10 * 1024**2):
         if custom_dir:
             dir = custom_dir
         elif self.model_dir:
@@ -92,7 +92,7 @@ class WordModel:
         if not self.w2v:
             raise NameError("No w2v model to export")
 
-        self.w2v.save('{}{}_model.model'.format(dir, name))
+        self.w2v.save('{}{}_model.model'.format(dir, name), sep_limit=sep_limit)
 
     # TODO: Check if a better w2v model can be created by increasing the window size from 2
     # TODO: Experiment with other w2v parameters
