@@ -1,3 +1,6 @@
+"""
+Core processing for a Word Model using Gensim Word2Vec and TensorFlow RNN.
+"""
 
 import pickle
 import json
@@ -16,15 +19,25 @@ from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import GRU
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
+from keras.models import model_from_json
 from unidecode import unidecode
 
 from corpus import Corpus
 
 
 class WordModel:
+    """
+    Contains all data and methods for developing and using a Word Model.
+    """
 
     def __init__(self, model_name, model_dir, sim_words):
-        """"""
+        """
+        Initialize a Word Model with a name, file directory, and a list of seed words.
+
+        :param model_name: The name of the model.
+        :param model_dir: The directory where the model's files will be stored.
+        :param sim_words: A list of words that appear in the model's corpus, to be used as seeds.
+        """
 
         self.model_name = model_name
         self.model_dir = model_dir
@@ -43,17 +56,53 @@ class WordModel:
         self.sim_words = sim_words
 
     def w2v_grams_from_file(self, gram_file):
-        """"""
+        """
+        Load in a list of grams from a pickled file.
+
+        :param gram_file: The target file path.
+        """
 
         with open(gram_file, "rb") as fp:
             self.grams = pickle.load(fp)
 
     def w2v_model_from_file(self, model_file):
-        """"""
+        """
+        Load in a Word2Vec model from a binary file.
+
+        :param model_file: The target file path.
+        """
 
         self.w2v = Word2Vec.load(model_file)
 
+    def gen_model_from_file(self, model_file):
+        """
+        Load in a TensorFlow model architecture from a json file.
+
+        :param model_file: The target file path.
+        """
+
+        with open(model_file, 'r') as file:
+            json_config = file.read()
+
+        self.model = model_from_json(json_config)
+
+    def gen_load_checkpoint(self, checkpoint_file):
+        """
+        Load weights into the TensorFlow model from a checkpoint file.
+
+        :param checkpoint_file: The target file path.
+        """
+
+        self.model.load_weights(checkpoint_file)
+
     def w2v_grams_to_file(self, custom_dir: str = None, custom_name: str = None):
+        """
+        Save the Word2Vec model's list of grams to a pickled file.
+
+        :param custom_dir: Optional: A custom target directory.
+        :param custom_name: Optional: A custom file name.
+        """
+
         if custom_dir:
             dir = custom_dir
         elif self.model_dir:
@@ -74,7 +123,15 @@ class WordModel:
         with open('{}{}_grams.txt'.format(dir, name), 'wb') as fp:
             pickle.dump(self.grams, fp)
 
-    def w2v_model_to_file(self, custom_dir: str = None, custom_name: str = None):
+    def w2v_model_to_file(self, custom_dir: str = None, custom_name: str = None, sep_limit: int = 10 * 1024**2):
+        """
+        Save the Word2Vec model to a binary file.
+
+        :param custom_dir: Optional: A custom target directory.
+        :param custom_name: Optional: A custom file name.
+        :param sep_limit: Array separation limit, in bytes.
+        """
+
         if custom_dir:
             dir = custom_dir
         elif self.model_dir:
@@ -92,17 +149,24 @@ class WordModel:
         if not self.w2v:
             raise NameError("No w2v model to export")
 
-        self.w2v.save('{}{}_model.model'.format(dir, name))
+        self.w2v.save('{}{}_model.model'.format(dir, name), sep_limit=sep_limit)
 
-    # TODO: Check if a better w2v model can be created by increasing the window size from 2
-    # TODO: Experiment with other w2v parameters
-    # TODO: "Improve text processing" - find a way to keep pronouns / conjugations of "be" and so forth
-    # TODO: "Improving training sets" - create a larger set of smaller, staggered sentences.
-    #       Perhaps 10-20 words long, staggered every 5 words. Also experiment with staggering by 1 and 2 words.
     def w2v_grams(self, corpus_file: str = './data/corpus_directory.json', corpus_dir: str = './data/corpus/',
                   author: str = None, genre: str = None, log: bool = True, sentence_len: int = 40,
                   sentence_offset: int = 5, phrase_min_count: int = 20, phrase_threshold: int = 2, ):
-        """"""
+        """
+        Create a nested list of grams (words and word-pairs) from a corpus.
+
+        :param corpus_file: A path to the Corpus Directory json file.
+        :param corpus_dir: A path to the directory of the text files that make up the corpus.
+        :param author: The full name of the desired author. For example: "Arthur Conan Doyle".
+        :param genre: The desired genre or tag. For example: "fantasy".
+        :param log: If true, prints process text to console.
+        :param sentence_len: The desired length of the gram lists.
+        :param sentence_offset: The desired offset for list staggering.
+        :param phrase_min_count: Word-pairs that appear more times than this may be considered n-grams.
+        :param phrase_threshold: Words and word-pairs that appear fewer times than this will be excluded.
+        """
 
         # Check if arguments make sense
         if author and genre:
@@ -203,7 +267,14 @@ class WordModel:
             print('Time to grammatize: {} min'.format(round((time() - t) / 60, 2)))
 
     def w2v_seeds(self, text: list, log: bool = True, save: bool = True):
-        """"""
+        """
+        Create a list of seeds for this model, given a list of strings.
+
+        :param text: The strings to convert to seeds.
+        :param log: If true, prints process text to console.
+        :param save: If true, saves the seeds to a file determined by the model parameters.
+        :return: Returns a list of seeds strings.
+        """
 
         t = time()
 
@@ -268,6 +339,18 @@ class WordModel:
 
     def w2v_train(self, log: bool = True, min_count: int = 1, window: int = 2, sample: float = 6e-5,
                   alpha: float = 0.03, min_alpha: float = 0.0007, negative: int = 20, workers: int = 4):
+        """
+        Train the Word2Vec model.
+
+        :param log: If true, prints process text to log.
+        :param min_count: Grams that appear fewer times than this will not be vectorized.
+        :param window: Size of the context-window - determines size of the model.
+        :param sample: Random downsampling threshold.
+        :param alpha: The initial learning rate.
+        :param min_alpha: The minimum learning rate to pursue in training.
+        :param negative: How many noise words to use for negative sampling.
+        :param workers: Number of worker threads.
+        """
 
         t = time()
 
@@ -298,7 +381,18 @@ class WordModel:
     def gen_train(self, epochs: int = 40, batch_size: int = 256, rnn_units: int = 1024,
                   recurrent_initializer: str = 'glorot_uniform', log: bool = True, activation: str = 'softmax',
                   optimizer: str = 'adam', loss_algorithm: str = 'sparse_categorical_crossentropy'):
-        """"""
+        """
+        Train the Sequential model.
+
+        :param epochs: How many training cycles (epochs) to train for.
+        :param batch_size: The size of training batches.
+        :param rnn_units: How many cells to use in the RNN (LSTM/GRU) layer.
+        :param recurrent_initializer: Name of initializer for the recurrent-kernel weights matrix.
+        :param log: If true, prints process text to console.
+        :param activation: Name of activation function.
+        :param optimizer: Name of optimization instance.
+        :param loss_algorithm: Name of loss algorithm.
+        """
 
         # limit input samples to a multiple of batch size
         grams = self.grams[:batch_size * round(len(self.grams) / batch_size)]
@@ -359,7 +453,11 @@ class WordModel:
         self.model.fit(train_x, train_y, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
 
     def _w2v_load_spacy(self):
-        """"""
+        """
+        Load the appropriate spacy package.
+
+        :return:
+        """
 
         # Ensuring correct model is loaded in
         if spacy.util.is_package('en'):
@@ -371,7 +469,12 @@ class WordModel:
         return True
 
     def _w2v_lemmatize(self, doc):
-        """"""
+        """
+        Lemmatize a string. Cuts plurals and most conjugations.
+
+        :param doc: The string to be lemmatized.
+        :return: The lemmatized string.
+        """
         # Begin lemmatization and removing stopwords - keeping pronouns and "be" conjugations
         # txt = [token.lemma_ for token in self.nlp(doc)]
 
@@ -395,6 +498,13 @@ class WordModel:
 
     @staticmethod
     def _w2v_pron(text):
+        """
+        Given a pronoun, returns the same or equivalent pronoun from a restricted set.
+
+        :param text: The given pronoun.
+        :return: The equivalent pronoun, or none, if no pronoun was given.
+        """
+
         if text in ['i']:
             return 'i'
         elif text in ['me', 'myself']:
@@ -438,6 +548,13 @@ class WordModel:
 
     @staticmethod
     def _w2v_be(text):
+        """
+        Given a conjugation of "be", returns the same or equivalent conjugation from a restricted set.
+
+        :param text: The given conjugation.
+        :return: The equivalent conjugation, or none, if no conjugation was given.
+        """
+
         if text in ['be']:
             return 'be'
         if text in ['am']:
@@ -458,7 +575,12 @@ class WordModel:
             return None
 
     def _w2v_word_similarities(self, len: int, custom_words: list = None):
-        """"""
+        """
+        Given the model's sim-word list, print out similar words.
+
+        :param len: The number of similar words to display.
+        :param custom_words: Optional: A custom list of words.
+        """
 
         if custom_words:
             # TODO: Custom words not yet implemented
@@ -476,19 +598,36 @@ class WordModel:
         Returns a generator - use list() to decompose.
 
         See: https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+
+        :param lst: The list to be chunked.
+        :param n: The chunk size.
+        :return: A generator containing the chunked lists.
         """
 
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
     def _gen_word2idx(self, word):
+        """
+        Convert a word string to Word2Vec vocabulary index.
+
+        :param word: The word to convert.
+        :return: The given word's index.
+        """
         return self.w2v.wv.vocab[word].index
 
     def _gen_idx2word(self, idx):
+        """
+        Convert a Word2Vec vocabulary index to a word string.
+
+        :param idx: The index to convert.
+        :return: The word string for the given index.
+        """
         return self.w2v.wv.index2word[idx]
 
     @staticmethod
     def _gen_sample(preds, temperature=1.0):
+        """"""
         if temperature <= 0:
             return np.argmax(preds)
         preds = np.asarray(preds).astype('float64')
@@ -499,6 +638,13 @@ class WordModel:
         return np.argmax(probas)
 
     def _gen_generate_next(self, text, num_generated=16):
+        """
+        Generate and return a number of words based on a given seed.
+
+        :param text: The seed text.
+        :param num_generated: The number of words to generate.
+        :return: The generated string, including the seed.
+        """
         word_idxs = [self._gen_word2idx(word) for word in text.lower().split()]
         for i in range(num_generated):
             prediction = self.model.predict(x=np.array(word_idxs))
@@ -507,25 +653,14 @@ class WordModel:
         return ' '.join(self._gen_idx2word(idx) for idx in word_idxs)
 
     def _gen_on_epoch_end(self, epoch, _):
+        """
+        A method called after each epoch of training. Generates text with the model's sim-words as seeds.
+
+        :param epoch: The epoch number.
+        :param _: Unused variable.
+        """
         print('\nGenerating text after epoch: %d' % epoch)
 
         for text in self.sim_words:
             sample = self._gen_generate_next(text)
             print('%s... -> %s' % (text, sample))
-
-    @staticmethod
-    def _gen_create_model(w2v, rnn_units: int = 1024,
-                          recurrent_initializer: str = 'glorot_uniform', activation: str = 'softmax',
-                          optimizer: str = 'adam', loss_algorithm: str = 'sparse_categorical_crossentropy'):
-
-        pretrained_weights = w2v.wv.syn0
-        vocab_size, embedding_size = pretrained_weights.shape
-
-        model = Sequential()
-        model.add(Embedding(input_dim=vocab_size, output_dim=embedding_size))
-        model.add(LSTM(rnn_units, return_sequences=False, recurrent_initializer=recurrent_initializer))
-        model.add(Dense(units=vocab_size))
-        model.add(Activation(activation))
-        model.compile(optimizer=optimizer, loss=loss_algorithm)
-
-        return model
