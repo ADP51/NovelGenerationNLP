@@ -1,6 +1,7 @@
 Package Summary - List of non-dependent packages:
 
 cchardet
+gensim
 jupyter
 keras
 pandas
