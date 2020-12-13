@@ -3,28 +3,6 @@ from keras.models import model_from_json
 from WordModel import WordModel
 
 
-def doyle_test1():
-    test = WordModel('doyle_test1', 'E:/NovelGenerationNLP/test_models/',
-                     ['holmes', 'watson', 'gun', 'war', 'mystery', 'murder', 'woman'])
-
-    test.w2v_grams(author='Arthur Conan Doyle', sentence_len=8, sentence_offset=1)
-    test.w2v_train(workers=6)
-    # test.w2v_grams_to_file()
-    # test.w2v_model_to_file()
-
-    # test.w2v_grams_from_file('E:/NovelGenerationNLP/test_models/doyle_test1_grams.txt')
-    # test.w2v_model_from_file('E:/NovelGenerationNLP/test_models/doyle_test1_model.model')
-
-    test.gen_train(epochs=1, batch_size=4096, rnn_units=128)
-    # test.w2v_seeds(['Elementary, my dear Watson.', 'When you have eliminated all which is impossible,',
-    #                 'There is nothing more deceptive than an obvious fact.', 'You see, but you do not observe.',
-    #                 'Take a community of Dutchmen of the type of those who defended themselves',
-    #                 'My name is Sherlock Holmes.'
-    #                 ], log=False)
-
-    return test
-
-
 def arthur_conan_doyle_w2v():
     test = WordModel('arthur-conan-doyle', 'E:/NovelGenerationNLP/test_models/',
                      ['holmes', 'watson', 'gun', 'war', 'mystery', 'murder', 'woman'])
